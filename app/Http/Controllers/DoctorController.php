@@ -11,4 +11,16 @@ class DoctorController extends Controller
     {
         return view('doctor.dashboard');
     }
+
+public function dashboard()
+{
+    $doctor = auth()->user(); // The logged-in doctor
+
+    $appointments = \App\Models\Appointment::with('patient')
+        ->where('doctor_id', $doctor->id)
+        ->orderBy('appointment_date', 'desc')
+        ->get();
+
+    return view('doctor.dashboard', compact('appointments'));
+}
 }

@@ -39,4 +39,9 @@ class AppServiceProvider extends ServiceProvider
          Route::aliasMiddleware('is_patient', IsPatient::class);
            
     }
+
+
+    
+
+
 }

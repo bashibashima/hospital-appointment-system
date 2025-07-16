@@ -1,5 +1,8 @@
 <?php
 
+
+
+
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -43,13 +46,18 @@ public function isPatient() {
     return $this->role === 'patient';
 }
 
-
-
-public function appointmentsAsPatient()
+public function doctor()
 {
-    return $this->hasMany(App\Models\Appointment::class, 'patient_id');
+    return $this->belongsTo(Doctor::class);
 }
 
+// public function appointmentsAsPatient()
+// {
+//     return $this->hasMany(App\Models\Appointment::class, 'patient_id');
+// }
+public function appointments() {
+    return $this->hasMany(App\Models\Appointment, 'patient_id');
+}
 public function appointmentsAsDoctor()
 {
     return $this->hasMany(App\Models\Appointment::class, 'doctor_id');

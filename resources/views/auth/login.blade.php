@@ -43,5 +43,17 @@
                 {{ __('Log in') }}
             </x-primary-button>
         </div>
+<p class="mt-4 text-sm text-center">
+    Are you a doctor?
+    <a href="{{ route('doctor.register') }}" class="text-blue-600 underline">Register as a Doctor</a>
+</p>
+
+        
     </form>
+    @if (session('message'))
+    <div class="mb-4 text-green-600">
+        {{ session('message') }}
+    </div>
+@endif
+
 </x-guest-layout>
