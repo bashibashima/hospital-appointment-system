@@ -1,34 +1,42 @@
-@extends('layouts.app')
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            My Appointments
+        </h2>
+    </x-slot>
 
-@section('content')
-<div class="max-w-4xl mx-auto p-6">
-    <h1 class="text-2xl font-bold text-blue-700 mb-4">My Appointments</h1>
-
-    @if($appointments->isEmpty())
-        <p class="text-gray-600">You have no appointments yet.</p>
-    @else
-        <table class="w-full bg-white rounded shadow">
-            <thead class="bg-blue-100">
-                <tr>
-                    <th class="p-3 text-left">Date</th>
-                    <th class="p-3 text-left">Time</th>
-                    <th class="p-3 text-left">Doctor</th>
-                    <th class="p-3 text-left">Status</th>
-                    <th class="p-3 text-left">Notes</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($appointments as $appointment)
-                <tr class="border-b">
-                    <td class="p-3">{{ $appointment->date }}</td>
-                    <td class="p-3">{{ $appointment->time }}</td>
-                    <td class="p-3">{{ $appointment->doctor->name ?? 'N/A' }}</td>
-                    <td class="p-3">{{ ucfirst($appointment->status) }}</td>
-                    <td class="p-3">{{ $appointment->notes }}</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-    @endif
-</div>
-@endsection
+    <div class="py-10">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white shadow-sm sm:rounded-lg p-6">
+                @if ($appointments->isEmpty())
+                    <p class="text-gray-600">You have no appointments yet.</p>
+                @else
+                    <table class="table-auto w-full text-left">
+                        <thead>
+                            <tr>
+                                <th class="px-4 py-2">Doctor</th>
+                                <th class="px-4 py-2">Date</th>
+                                <th class="px-4 py-2">Time</th>
+                                <th class="px-4 py-2">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($appointments as $appointment)
+                                <tr>
+                                    <td class="border px-4 py-2">
+                                        {{ $appointment->doctor->name ?? 'N/A' }}
+                                    </td>
+                                    <td class="border px-4 py-2">
+                                        {{ \Carbon\Carbon::parse($appointment->date)->format('d M Y') }}
+                                    </td>
+                                    <td class="border px-4 py-2">{{ $appointment->time }}</td>
+                                    <td class="border px-4 py-2 capitalize">{{ $appointment->status }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @endif
+            </div>
+        </div>
+    </div>
+</x-app-layout>

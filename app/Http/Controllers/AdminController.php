@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -12,18 +13,29 @@ class AdminController extends Controller
      */
     public function index()
     {
-        $users=User::all();
+        // Total user statistics
         $totalUsers = User::count();
         $totalDoctors = User::where('role', 'doctor')->count();
         $totalPatients = User::where('role', 'patient')->count();
         $totalAppointments = Appointment::count();
 
+        // Pending doctors (for admin approval)
+        $pendingDoctors = User::where('role', 'doctor')
+                              ->where('status', 'pending')
+                              ->get();
+
+        // Pending appointments (status = 'pending')
+        $pendingAppointments = Appointment::where('status', 'pending')
+                                          ->with(['doctor', 'patient'])
+                                          ->get();
+
         return view('admin.dashboard', compact(
-            'users',
             'totalUsers',
             'totalDoctors',
             'totalPatients',
-            'totalAppointments'
+            'totalAppointments',
+            'pendingDoctors',
+            'pendingAppointments'
         ));
     }
 

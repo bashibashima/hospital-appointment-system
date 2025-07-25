@@ -46,8 +46,6 @@ class Kernel extends HttpKernel
         'role' => \App\Http\Middleware\RoleMiddleware::class, // role middleware
 
 
-
-
 'is_admin' => \App\Http\Middleware\IsAdmin::class,
     'is_doctor' => \App\Http\Middleware\IsDoctor::class,
     'is_patient' => \App\Http\Middleware\IsPatient::class,
