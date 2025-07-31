@@ -12,10 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('availabilities', function (Blueprint $table) {
-            $table->enum('day_of_week', ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'])
-                  ->after('id');
-
-            $table->string('time')->after('day_of_week'); // Doctor enters manually, e.g., "10:00 AM - 12:00 PM"
+            if (!Schema::hasColumn('availabilities', 'day_of_week')) {
+                $table->enum('day_of_week', [
+                    'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
+                ])->after('id');
+            }
         });
     }
 
@@ -25,8 +26,14 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('availabilities', function (Blueprint $table) {
-            $table->dropColumn('day_of_week');
-            $table->dropColumn('time');
+            if (Schema::hasColumn('availabilities', 'day_of_week')) {
+                $table->dropColumn('day_of_week');
+            }
+
+            // If you meant to remove a specific column like 'start_time' or 'time_slot', adjust this accordingly:
+            // if (Schema::hasColumn('availabilities', 'start_time')) {
+            //     $table->dropColumn('start_time');
+            // }
         });
     }
 };

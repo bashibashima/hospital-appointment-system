@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Patient;
 
 use App\Http\Controllers\Controller;
@@ -12,7 +13,7 @@ class PatientDashboardController extends Controller
     {
         $user = Auth::user(); // Authenticated patient
 
-        // Load appointments with related doctor data
+        // Only eager load 'doctor' because doctor() returns a User model
         $appointments = Appointment::with('doctor')
             ->where('patient_id', $user->id)
             ->latest()

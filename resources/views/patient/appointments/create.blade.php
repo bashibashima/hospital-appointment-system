@@ -5,63 +5,63 @@
         </h2>
     </x-slot>
 
-    <div class="py-10">
-        <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white p-6 rounded shadow">
-                @if (session('success'))
-                    <div class="mb-4 text-green-600 font-semibold">
-                        {{ session('success') }}
-                    </div>
-                @endif
+    <script>
+    function fetchAvailableSlots() {
+        const doctorId = document.getElementById('doctor_id').value;
+        const date = document.getElementById('appointment_date').value;
 
-                <!-- Validation Errors -->
-                @if ($errors->any())
-                    <div class="mb-4 text-red-600">
-                        <ul class="list-disc pl-5">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
+        if (doctorId && date) {
+            fetch(`/patient/get-available-slots?doctor_id=${doctorId}&appointment_date=${date}`)
+                .then(res => res.json())
+                .then(data => {
+                    const timeSelect = document.getElementById('appointment_time');
+                    timeSelect.innerHTML = '';
 
-                <form method="POST" action="{{ route('patient.appointments.store') }}">
-                    @csrf
+                    if (data.length === 0) {
+                        timeSelect.innerHTML = '<option>No available slots</option>';
+                        return;
+                    }
 
-                    <!-- Doctor -->
-                    <div class="mb-4">
-                        <x-input-label for="doctor_id" :value="'Select Doctor'" />
-                        <select id="doctor_id" name="doctor_id" required class="block mt-1 w-full border-gray-300 rounded-md shadow-sm">
-                            <option value="">-- Choose Doctor --</option>
-                            @foreach ($doctors as $doctor)
-                                <option value="{{ $doctor->id }}">{{ $doctor->name }} ({{ $doctor->specialization->name ?? 'N/A' }})</option>
-                            @endforeach
-                        </select>
-                    </div>
+                    data.forEach(slot => {
+                        const option = document.createElement('option');
+                        option.value = slot.start;
+                        option.text = `${slot.start} - ${slot.end}`;
+                        timeSelect.appendChild(option);
+                    });
+                });
+        }
+    }
+</script>
 
-                    <!-- Appointment Date -->
-                    <div class="mb-4">
-                        <x-input-label for="appointment_date" :value="'Appointment Date'" />
-                        <x-text-input type="date" name="appointment_date" id="appointment_date" required class="block mt-1 w-full" />
-                    </div>
+<form method="POST" action="{{ route('appointments.book') }}">
+    @csrf
 
-                    <!-- Appointment Time -->
-                    <div class="mb-4">
-                        <x-input-label for="appointment_time" :value="'Appointment Time'" />
-                        <x-text-input type="time" name="appointment_time" id="appointment_time" required class="block mt-1 w-full" />
-                    </div>
-
-                    <!-- Notes -->
-                    <div class="mb-4">
-                        <x-input-label for="notes" :value="'Notes (Optional)'" />
-                        <textarea name="notes" id="notes" rows="3" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm">{{ old('notes') }}</textarea>
-                    </div>
-
-                    <x-primary-button class="mt-4">
-                        Book Appointment
-                    </x-primary-button>
-                </form>
-            </div>
-        </div>
+    <div class="mb-4">
+        <label>Doctor</label>
+        <select name="doctor_id" id="doctor_id" onchange="fetchAvailableSlots()" class="w-full border rounded p-2" required>
+            <option value="">-- Select Doctor --</option>
+            @foreach ($doctors as $doctor)
+                <option value="{{ $doctor->id }}">{{ $doctor->user->name }}</option>
+            @endforeach
+        </select>
     </div>
-</x-app-layout>
+
+    <div class="mb-4">
+        <label>Date</label>
+        <input type="date" name="appointment_date" id="appointment_date" onchange="fetchAvailableSlots()" class="w-full border rounded p-2" required>
+    </div>
+
+    <div class="mb-4">
+        <label>Time Slot</label>
+        <select name="appointment_time" id="appointment_time" class="w-full border rounded p-2" required>
+            <option value="">Select date and doctor first</option>
+        </select>
+    </div>
+
+    <div class="mb-4">
+        <label>Notes</label>
+        <textarea name="notes" class="w-full border rounded p-2"></textarea>
+    </div>
+
+    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Book Appointment</button>
+</form>

@@ -7,8 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Appointment extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'patient_id',
         'doctor_id',
@@ -18,22 +16,24 @@ class Appointment extends Model
         'notes',
     ];
 
-    /**
-     * Relationship: Appointment belongs to a Doctor (User)
-     */
-    public function doctor()
-    {
-        return $this->belongsTo(User::class, 'doctor_id');
-    }
 
-    /**
-     * Relationship: Appointment belongs to a Patient (User)
-     */
-    public function patient()
-    {
-        return $this->belongsTo(User::class, 'patient_id');
-    }
-    // In App\Models\Appointment.php
+
+// For basic info like doctor name/email from users table
+
+    public function doctor()
+{
+    return $this->belongsTo(User::class, 'doctor_id');
 }
 
+// For extra info like specialization, bio from doctors table
+public function doctorProfile()
+{
+    return $this->hasOne(Doctor::class, 'user_id', 'doctor_id');
+}
+
+public function patient()
+{
+    return $this->belongsTo(User::class, 'patient_id');
+}
+}
 

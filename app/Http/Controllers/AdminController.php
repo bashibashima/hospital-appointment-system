@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Doctor;
 use App\Models\Appointment;
 
 class AdminController extends Controller
@@ -13,21 +14,27 @@ class AdminController extends Controller
      */
     public function index()
     {
-        // Total user statistics
+        // Total counts
         $totalUsers = User::count();
         $totalDoctors = User::where('role', 'doctor')->count();
         $totalPatients = User::where('role', 'patient')->count();
         $totalAppointments = Appointment::count();
 
-        // Pending doctors (for admin approval)
+        // Pending doctors (for approval)
         $pendingDoctors = User::where('role', 'doctor')
-                              ->where('status', 'pending')
-                              ->get();
+            ->where('status', 'pending')
+            ->get();
 
-        // Pending appointments (status = 'pending')
+        // Approved doctors for time slot management
+        $doctors = Doctor::with('user')
+            ->whereHas('user', function ($q) {
+                $q->where('status', 'approved');
+            })->get();
+
+        // Pending appointments
         $pendingAppointments = Appointment::where('status', 'pending')
-                                          ->with(['doctor', 'patient'])
-                                          ->get();
+            ->with(['doctor', 'patient'])
+            ->get();
 
         return view('admin.dashboard', compact(
             'totalUsers',
@@ -35,18 +42,19 @@ class AdminController extends Controller
             'totalPatients',
             'totalAppointments',
             'pendingDoctors',
-            'pendingAppointments'
+            'pendingAppointments',
+            'doctors'
         ));
     }
 
     /**
-     * Show list of pending doctors waiting for approval.
+     * Show list of pending doctors (optional, if you have a separate page).
      */
     public function showPendingDoctors()
     {
         $pendingDoctors = User::where('role', 'doctor')
-                              ->where('status', 'pending')
-                              ->get();
+            ->where('status', 'pending')
+            ->get();
 
         return view('admin.pending-doctors', compact('pendingDoctors'));
     }
@@ -66,5 +74,26 @@ class AdminController extends Controller
         $doctor->save();
 
         return redirect()->back()->with('success', 'Doctor approved successfully!');
+    }
+
+    /**
+     * Edit a doctor's permission (can_manage_slots).
+     */
+    public function editDoctor($id)
+    {
+        $doctor = Doctor::with('user')->findOrFail($id);
+        return view('admin.doctors.edit', compact('doctor'));
+    }
+
+    /**
+     * Update doctor permissions.
+     */
+    public function updateDoctor(Request $request, $id)
+    {
+        $doctor = Doctor::findOrFail($id);
+        $doctor->can_manage_slots = $request->has('can_manage_slots');
+        $doctor->save();
+
+        return redirect()->route('admin.dashboard')->with('success', 'Doctor updated successfully.');
     }
 }

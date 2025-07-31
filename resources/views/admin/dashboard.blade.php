@@ -5,82 +5,108 @@
         </h2>
     </x-slot>
 
-    <div class="py-8">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+    <div class="py-6 max-w-7xl mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <x-dashboard-card title="Users" :count="$totalUsers" />
+            <x-dashboard-card title="Doctors" :count="$totalDoctors" />
+            <x-dashboard-card title="Patients" :count="$totalPatients" />
+            <x-dashboard-card title="Appointments" :count="$totalAppointments" />
+        </div>
 
-            <!-- Flash Messages -->
-            @if(session('success'))
-                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-                    {{ session('success') }}
-                </div>
-            @elseif(session('error'))
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                    {{ session('error') }}
-                </div>
-            @endif
-
-            <!-- Statistics Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div class="bg-white shadow rounded-lg p-6 text-center">
-                    <h3 class="text-lg font-bold text-gray-700">Users</h3>
-                    <p class="text-2xl">{{ $totalUsers }}</p>
-                </div>
-                <div class="bg-white shadow rounded-lg p-6 text-center">
-                    <h3 class="text-lg font-bold text-gray-700">Doctors</h3>
-                    <p class="text-2xl">{{ $totalDoctors }}</p>
-                </div>
-                <div class="bg-white shadow rounded-lg p-6 text-center">
-                    <h3 class="text-lg font-bold text-gray-700">Patients</h3>
-                    <p class="text-2xl">{{ $totalPatients }}</p>
-                </div>
-                <div class="bg-white shadow rounded-lg p-6 text-center">
-                    <h3 class="text-lg font-bold text-gray-700">Appointments</h3>
-                    <p class="text-2xl">{{ $totalAppointments }}</p>
-                </div>
-            </div>
-
-            <!-- Pending Doctor Approvals -->
-            <div class="bg-white shadow rounded-lg p-6">
-                <h3 class="text-lg font-bold mb-4">Pending Doctor Approvals</h3>
-                @if($pendingDoctors->count())
-                    <ul class="divide-y divide-gray-200">
+        {{-- Pending Doctor Approvals --}}
+        <div class="bg-white shadow rounded p-6 mb-6">
+            <h3 class="text-lg font-semibold mb-4">Pending Doctor Approvals</h3>
+            @if($pendingDoctors->isEmpty())
+                <p class="text-gray-600">No pending approvals.</p>
+            @else
+                <table class="w-full table-auto">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="text-left p-2">Name</th>
+                            <th class="text-left p-2">Email</th>
+                            <th class="text-left p-2">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
                         @foreach($pendingDoctors as $doctor)
-                            <li class="py-3 flex justify-between items-center">
-                                <div>
-                                    <p class="font-semibold">{{ $doctor->name }}</p>
-                                    <p class="text-sm text-gray-600">{{ $doctor->email }}</p>
-                                </div>
-                                <form action="{{ route('admin.approve.doctor', $doctor->id) }}" method="POST">
-                                    @csrf
-                                    <x-primary-button>Approve</x-primary-button>
-                                </form>
-                            </li>
+                            <tr class="border-t">
+                                <td class="p-2">{{ $doctor->name }}</td>
+                                <td class="p-2">{{ $doctor->email }}</td>
+                                <td class="p-2">
+                                    <form method="POST" action="{{ route('admin.approve.doctor', $doctor->id) }}">
+                                        @csrf
+                                        <x-primary-button>Approve</x-primary-button>
+                                    </form>
+                                </td>
+                            </tr>
                         @endforeach
-                    </ul>
-                @else
-                    <p class="text-gray-600">No pending doctors.</p>
-                @endif
-            </div>
+                    </tbody>
+                </table>
+            @endif
+        </div>
 
-            <!-- Pending Appointments -->
-            <div class="bg-white shadow rounded-lg p-6">
-                <h3 class="text-lg font-bold mb-4">Pending Appointments</h3>
-                @if($pendingAppointments->count())
-                    <ul class="divide-y divide-gray-200">
-                        @foreach($pendingAppointments as $appt)
-                            <li class="py-3">
-                                <p>
-                                    <strong>Patient:</strong> {{ $appt->patient->name ?? 'Unknown' }} <br>
-                                    <strong>Doctor:</strong> {{ $appt->doctor->name ?? 'Unknown' }} <br>
-                                    <strong>Date:</strong> {{ $appt->appointment_date }} {{ $appt->appointment_time }}
-                                </p>
-                            </li>
+        {{-- Doctor Availability: Manage Time Slots --}}
+        <div class="bg-white shadow rounded p-6 mb-6">
+            <h3 class="text-lg font-semibold mb-4">Doctor Availability</h3>
+            @if($doctors->isEmpty())
+                <p class="text-gray-600">No approved doctors available.</p>
+            @else
+                <table class="w-full table-auto">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="text-left p-2">Name</th>
+                            <th class="text-left p-2">Email</th>
+                            <th class="text-left p-2">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($doctors as $doc)
+                            <tr class="border-t">
+                                <td class="p-2">{{ $doc->user->name }}</td>
+                                <td class="p-2">{{ $doc->user->email }}</td>
+                                <td class="p-2">
+                                    <a href="{{ route('admin.doctor.edit', $doc->id) }}"
+                                       class="text-blue-600 hover:underline">Edit Permission</a>
+                                    @if($doc->can_manage_slots)
+                                        <span class="mx-2">|</span>
+                                        <a href="{{ route('admin.doctor.slots', $doc->id) }}"
+                                           class="text-green-600 hover:underline">Manage Time Slots</a>
+                                    @endif
+                                </td>
+                            </tr>
                         @endforeach
-                    </ul>
-                @else
-                    <p class="text-gray-600">No pending appointments.</p>
-                @endif
-            </div>
+                    </tbody>
+                </table>
+            @endif
+        </div>
+
+        {{-- Pending Appointments --}}
+        <div class="bg-white shadow rounded p-6">
+            <h3 class="text-lg font-semibold mb-4">Pending Appointments</h3>
+            @if($pendingAppointments->isEmpty())
+                <p class="text-gray-600">No pending appointments.</p>
+            @else
+                <table class="w-full table-auto">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="text-left p-2">Patient</th>
+                            <th class="text-left p-2">Doctor</th>
+                            <th class="text-left p-2">Date</th>
+                            <th class="text-left p-2">Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($pendingAppointments as $appointment)
+                            <tr class="border-t">
+                                <td class="p-2">{{ $appointment->patient->name }}</td>
+                                <td class="p-2">{{ $appointment->doctor->name }}</td>
+                                <td class="p-2">{{ \Carbon\Carbon::parse($appointment->appointment_date)->format('d M Y') }}</td>
+                                <td class="p-2">{{ \Carbon\Carbon::parse($appointment->appointment_time)->format('H:i') }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @endif
         </div>
     </div>
 </x-app-layout>

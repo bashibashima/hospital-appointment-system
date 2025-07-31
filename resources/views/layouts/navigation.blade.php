@@ -13,8 +13,18 @@
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+
                         {{ __('Dashboard') }}
                     </x-nav-link>
+                 @auth
+    @if (Auth::user()->role === 'doctor')
+        <x-nav-link :href="route('doctor.availability')" :active="request()->routeIs('doctor.availability')">
+            {{ __('Availability') }}
+        </x-nav-link>
+    @endif
+@endauth
+
+
                 </div>
             </div>
 

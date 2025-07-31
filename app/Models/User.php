@@ -1,5 +1,8 @@
 <?php
 namespace App\Models;
+use App\Models\Appointment;
+use App\Models\Notification;
+
 use Illuminate\Notifications\Notifiable;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,7 +19,7 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
-     use Notifiable;
+
 
 
 protected $fillable = [
@@ -54,6 +57,7 @@ public function doctor()
     return $this->hasOne(\App\Models\Doctor::class);
 }
 
+
 public function notifications()
 {
     return $this->hasMany(Notification::class);
@@ -64,13 +68,19 @@ public function notifications()
 // {
 //     return $this->hasMany(App\Models\Appointment::class, 'patient_id');
 // }
-public function appointments() {
-    return $this->hasMany(App\Models\Appointment, 'patient_id');
+
+// If patient:
+public function appointmentsAsPatient()
+{
+    return $this->hasMany(\App\Models\Appointment::class, 'patient_id');
 }
+
+// If doctor:
 public function appointmentsAsDoctor()
 {
-    return $this->hasMany(App\Models\Appointment::class, 'doctor_id');
+    return $this->hasMany(\App\Models\Appointment::class, 'doctor_id');
 }
+
 
 
     /**

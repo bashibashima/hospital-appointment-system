@@ -3,48 +3,68 @@
         <h2 class="text-xl font-bold">Patient Dashboard</h2>
     </x-slot>
 
-    <div class="container">
-        <h2>Welcome, {{ $user->name }} 👋</h2>
+    <div class="container mx-auto px-4 py-6">
+        {{-- Greeting --}}
+        <h2 class="text-lg font-semibold mb-4">Welcome, {{ $user->name }} 👋</h2>
 
-        <div class="card my-3">
-            <div class="card-header">Upcoming Appointments</div>
-            <div class="card-body">
-                @if($appointments->count())
-                    <ul class="list-group">
-                        @foreach($appointments as $appt)
-                            <li class="list-group-item d-flex justify-content-between">
-                                {{ $appt->appointment_date }} at {{ $appt->appointment_time }}
-                                with Dr. {{ $appt->doctor->name }}
-                                <span class="badge bg-success">{{ $appt->status }}</span>
-                            </li>
-                        @endforeach
-                    </ul>
-                @else
-                    <p>No upcoming appointments. <a href="{{ route('patient.appointments.create') }}">Book one now</a>.</p>
-                @endif
-            </div>
+        {{-- Upcoming Appointments --}}
+        <div class="bg-white shadow rounded-lg p-4 mb-6">
+            <h3 class="text-md font-bold mb-2">📅 Upcoming Appointments</h3>
+
+            @if($appointments->count())
+                <ul class="divide-y divide-gray-200">
+                    @foreach($appointments as $appt)
+                        <li class="py-2 flex justify-between items-center">
+                            <div>
+                                {{ \Carbon\Carbon::parse($appt->appointment_date)->format('d M Y') }}
+                                at {{ \Carbon\Carbon::parse($appt->appointment_time)->format('H:i') }}
+                                with Dr. {{ $appt->doctor?->name ?? 'Unknown' }}
+                            </div>
+                            <span class="text-sm px-2 py-1 bg-green-100 text-green-800 rounded">
+                                {{ ucfirst($appt->status) }}
+                            </span>
+                        </li>
+                    @endforeach
+                </ul>
+            @else
+                <p class="text-gray-600">
+                    No upcoming appointments.
+                    <a href="{{ route('patient.appointments.create') }}" class="text-blue-600 underline">Book one now</a>.
+                </p>
+            @endif
         </div>
 
-        <div class="my-3">
-            <a href="{{ route('patient.appointments') }}" class="btn btn-primary">View All Appointments</a>
-            <a href="{{ route('patient.appointments.create') }}" class="btn btn-success">Book New Appointment</a>
+        {{-- Action Buttons --}}
+        <div class="mb-6 flex flex-wrap gap-4">
+            <a href="{{ route('patient.appointments') }}"
+               class="bg-blue-100 hover:bg-blue-200 text-black px-5 py-2 rounded-md text-sm shadow font-medium">
+                📋 View All Appointments
+            </a>
+
+            <a href="{{ route('patient.appointments.create') }}"
+               class="bg-green-100 hover:bg-green-200 text-black px-5 py-2 rounded-md text-sm shadow font-medium">
+                ➕ Book New Appointment
+            </a>
         </div>
 
-        <h2 class="text-xl font-bold mb-4">Your Booked Doctors</h2>
+        {{-- Booked Doctors --}}
+        <div class="bg-white shadow rounded-lg p-4">
+            <h3 class="text-md font-bold mb-2">🩺 Your Booked Doctors</h3>
 
-        @if($appointments->isEmpty())
-            <p>You have not booked any doctors yet.</p>
-        @else
-            <ul class="list-disc pl-5 space-y-2">
-                @foreach($appointments as $appointment)
-                    <li>
-                        Dr. {{ $appointment->doctor->name }}
-                        @if($appointment->appointment_date)
-                            – on {{ \Carbon\Carbon::parse($appointment->appointment_date)->format('d M Y') }}
-                        @endif
-                    </li>
-                @endforeach
-            </ul>
-        @endif
+            @if($appointments->isEmpty())
+                <p class="text-gray-600">You have not booked any doctors yet.</p>
+            @else
+                <ul class="list-disc list-inside space-y-1">
+                    @foreach($appointments as $appointment)
+                        <li>
+                            Dr. {{ $appointment->doctor?->name ?? 'Unknown' }}
+                            @if($appointment->appointment_date)
+                                – on {{ \Carbon\Carbon::parse($appointment->appointment_date)->format('d M Y') }}
+                            @endif
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
+        </div>
     </div>
 </x-app-layout>
