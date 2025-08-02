@@ -27,10 +27,11 @@ class TimeSlotController extends Controller
     
     
     // Show all time slots for a specific doctor
-    public function index(User $doctor)
+    public function index(Doctor $doctor)
 
 {
-    $availabilities = Availability::where('doctor_id', $doctor->doctor->id)->get();
+    
+    $availabilities = Availability::where('doctor_id', $doctor->id)->get();
     $daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
     return view('admin.availabilities.index', compact('doctor', 'availabilities', 'daysOfWeek'));
@@ -41,14 +42,14 @@ class TimeSlotController extends Controller
     public function store(Request $request, Doctor $doctor)
     {
        $request->validate([
-    'day_of_week' => 'required|in:Monday,Tuesday,...',
+    'day_of_week' => 'required|in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday',
     'start_time' => 'required|date_format:H:i',
     'end_time' => 'required|date_format:H:i|after:start_time',
     'slot_duration' => 'required|integer|min:5|max:60',
 ]);
 
 Availability::create([
-    'doctor_id' => $doctorId,
+    'doctor_id' => $doctor->id,
     'day_of_week' => $request->day_of_week,
     'start_time' => $request->start_time,
     'end_time' => $request->end_time,

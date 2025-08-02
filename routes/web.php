@@ -4,32 +4,32 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 
+// Auth & Profile Controllers
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\ProfileController;
 
+// Admin Controllers
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Admin\TimeSlotController;
 use App\Http\Controllers\Admin\GlobalSlotController;
 
+// Doctor Controllers
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\Doctor\DoctorRegisterController;
 use App\Http\Controllers\Doctor\DoctorDashboardController;
 use App\Http\Controllers\Doctor\AvailabilityController;
 
+// Patient Controllers
 use App\Http\Controllers\Patient\PatientDashboardController;
 use App\Http\Controllers\Patient\AppointmentController;
 
 // ==========================
 // Public Routes
 // ==========================
-Route::get('/', function () {
-    return view('welcome');
-});
-
+Route::get('/', fn () => view('welcome'));
 Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
-
 Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
 Route::post('/register', [RegisteredUserController::class, 'store'])->middleware('guest');
 
@@ -37,7 +37,7 @@ Route::get('/doctor/register', [DoctorRegisterController::class, 'create'])->nam
 Route::post('/doctor/register', [DoctorRegisterController::class, 'store'])->name('doctor.register.submit');
 
 // ==========================
-// Redirect After Login
+// Post-Login Redirect
 // ==========================
 Route::get('/redirect', function () {
     $user = auth()->user();
@@ -49,20 +49,16 @@ Route::get('/redirect', function () {
         ]);
     }
 
-    switch ($user->role) {
-        case 'admin':
-            return redirect('/admin/dashboard');
-        case 'doctor':
-            return redirect('/doctor/dashboard');
-        case 'patient':
-            return redirect('/patient/dashboard');
-        default:
-            abort(403);
-    }
+    return match ($user->role) {
+        'admin' => redirect('/admin/dashboard'),
+        'doctor' => redirect('/doctor/dashboard'),
+        'patient' => redirect('/patient/dashboard'),
+        default => abort(403),
+    };
 })->middleware('auth');
 
 // ==========================
-// Authenticated User Profile
+// Profile Routes
 // ==========================
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -73,63 +69,35 @@ Route::middleware('auth')->group(function () {
 // ==========================
 // Admin Routes
 // ==========================
-Route::middleware(['auth', 'is_admin'])
-    ->prefix('admin')
-    ->name('admin.')
-    ->group(function () {
+Route::middleware(['auth', 'is_admin'])->prefix('admin')->name('admin.')->group(function () {
 
-        Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
+    // Dashboard
+    Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
 
+    // User Management
+    Route::get('/users', [UserManagementController::class, 'index'])->name('users');
+    Route::post('/users/{id}/update-role', [UserManagementController::class, 'updateRole'])->name('users.update-role');
 
-        Route::get('/admin/doctors', [AdminController::class, 'index'])->name('admin.doctors.index');
+    // Doctor Management
+    Route::get('/doctors/pending', [AdminController::class, 'showPendingDoctors'])->name('pending.doctors');
+    Route::post('/doctors/approve/{id}', [AdminController::class, 'approveDoctor'])->name('approve.doctor');
+    Route::get('/doctors/{id}/view', [AdminController::class, 'viewDoctor'])->name('doctor.view');
+    Route::get('/doctors/{id}/edit', [AdminController::class, 'editDoctor'])->name('doctor.edit');
+    Route::put('/doctors/{id}', [AdminController::class, 'updateDoctor'])->name('doctor.update');
 
+    // Doctor Slot Management
+    Route::get('/doctors/{doctor}/slots', [TimeSlotController::class, 'index'])->name('doctor.slots');
 
-        // User Management
-        Route::get('/users', [UserManagementController::class, 'index'])->name('users');
-        Route::post('/users/{id}/update-role', [UserManagementController::class, 'updateRole'])->name('users.update-role');
+    // Availability Management
+    Route::get('/doctors', [TimeSlotController::class, 'doctors'])->name('doctors.list');
+    Route::get('/doctors/{doctor}/availabilities', [TimeSlotController::class, 'index'])->name('availabilities.index');
+    Route::post('/doctors/{doctor}/availabilities', [TimeSlotController::class, 'store'])->name('availabilities.store');
+    Route::delete('/availabilities/{id}', [TimeSlotController::class, 'destroy'])->name('availabilities.destroy');
 
-        // Doctor Approval
-        Route::get('/doctors/pending', [AdminController::class, 'showPendingDoctors'])->name('pending.doctors');
-        Route::post('/doctors/approve/{id}', [AdminController::class, 'approveDoctor'])->name('approve.doctor');
-        Route::get('/doctors/{id}/view', [AdminController::class, 'viewDoctor'])->name('doctor.view');
-        Route::get('/doctors/{doctor}/edit', [AdminController::class, 'editDoctor'])->name('doctor.edit');
-        Route::put('/doctors/{doctor}', [AdminController::class, 'updateDoctor'])->name('doctor.update');
-
-//Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
-
-    // Doctor approval
-    //Route::post('/admin/approve-doctor/{id}', [AdminController::class, 'approveDoctor'])->name('admin.approve.doctor');
-
-    // Edit doctor permissions
-   // Route::get('/admin/doctors/{id}/edit', [AdminController::class, 'editDoctor'])->name('admin.doctor.edit');
-   // Route::put('/admin/doctors/{id}', [AdminController::class, 'updateDoctor'])->name('admin.doctor.update');
-
-    // (Optional) Manage doctor slots
-    //Route::get('/admin/doctors/{id}/slots', [DoctorSlotController::class, 'index'])->name('admin.doctor.slots');
-
-
-
-
-//doctor permission
-        Route::get('/admin/doctors/{id}/edit', [AdminController::class, 'editDoctor'])->name('admin.doctor.edit');
-        //updating
-Route::put('/admin/doctors/{id}', [AdminController::class, 'updateDoctor'])->name('admin.doctor.update');
-//managing time slot
-Route::get('/admin/doctors/{id}/slots', [DoctorSlotController::class, 'index'])->name('admin.doctor.slots');
-
-
-        // Time Slot Management
-        Route::get('/doctors', [TimeSlotController::class, 'doctors'])->name('doctors.list');
-        Route::get('/doctors/{doctor}/availabilities', [TimeSlotController::class, 'index'])->name('availabilities.index');
-        Route::post('/doctors/{doctor}/availabilities', [TimeSlotController::class, 'store'])->name('availabilities.store');
-        Route::delete('/availabilities/{id}', [TimeSlotController::class, 'destroy'])->name('availabilities.destroy');
-
-       // Route::get('/doctors/{doctor}/slots', [TimeSlotController::class, 'adminManageSlots'])->name('doctor.slots');
-
-        // Global Time Slot Settings
-        Route::get('/global-time-slots', [GlobalSlotController::class, 'edit'])->name('global-slots.edit');
-        Route::put('/global-time-slots', [GlobalSlotController::class, 'update'])->name('global-slots.update');
-    });
+    // Global Time Slot Settings
+    Route::get('/global-slots', [GlobalSlotController::class, 'edit'])->name('global-slots.edit');
+    Route::put('/global-slots', [GlobalSlotController::class, 'update'])->name('global-slots.update');
+});
 
 // ==========================
 // Doctor Routes
@@ -137,10 +105,12 @@ Route::get('/admin/doctors/{id}/slots', [DoctorSlotController::class, 'index'])-
 Route::middleware(['auth', 'is_doctor'])->prefix('doctor')->group(function () {
     Route::get('/dashboard', [DoctorController::class, 'index'])->name('doctor.dashboard');
 
+    // Availability
     Route::get('/availability', [AvailabilityController::class, 'index'])->name('doctor.availability');
     Route::post('/availability', [AvailabilityController::class, 'store'])->name('availability.store');
     Route::delete('/availability/{id}', [AvailabilityController::class, 'destroy'])->name('availability.delete');
 
+    // Appointment Actions
     Route::post('/appointments/{id}/accept', [DoctorController::class, 'acceptAppointment'])->name('doctor.appointments.accept');
     Route::post('/appointments/{id}/reject', [DoctorController::class, 'rejectAppointment'])->name('doctor.appointments.reject');
     Route::post('/appointments/{id}/reschedule', [DoctorController::class, 'rescheduleAppointment'])->name('doctor.appointments.reschedule');
@@ -161,25 +131,18 @@ Route::middleware(['auth', 'is_patient'])->prefix('patient')->name('patient.')->
 });
 
 // ==========================
-// Miscellaneous
+// Miscellaneous Routes
 // ==========================
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', fn () => view('dashboard'))->middleware(['auth', 'verified'])->name('dashboard');
 
-// ==========================
-// Test Email (optional)
-// ==========================
+// Test Email
 Route::get('/test-email', function () {
-    Mail::raw("Dear Doctor,\n\nYour account has been approved by the administrator.\n\nYou can now log in to the Hospital Appointment System and start managing your profile and appointments.\n\nRegards,\nHospital Appointment System", function ($message) {
-        $message->to('bashibashima@gmail.com')
-                ->subject('Your Doctor Account Has Been Approved');
+    Mail::raw("Dear Doctor,\n\nYour account has been approved by the administrator.\n\nRegards,\nHospital Appointment System", function ($message) {
+        $message->to('bashibashima@gmail.com')->subject('Your Doctor Account Has Been Approved');
     });
 
     return '✅ Approval email sent to doctor!';
 });
 
-// ==========================
 // Breeze Auth Routes
-// ==========================
 require __DIR__.'/auth.php';

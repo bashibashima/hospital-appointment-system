@@ -10,7 +10,7 @@
             </div>
         @endif
 
-        <form action="{{ route('admin.global-slots.update') }}" method="POST">
+        <form action="{{ route('global-slots.update') }}" method="POST">
             @csrf
             @method('PUT')
 

@@ -26,6 +26,7 @@
                                 {{ \Carbon\Carbon::parse($slot->start_time)->format('h:i A') }}
                                 to
                                 {{ \Carbon\Carbon::parse($slot->end_time)->format('h:i A') }}
+                                <span class="text-sm text-gray-600">({{ $slot->slot_duration }} mins)</span>
                             </div>
                             <form action="{{ route('admin.availabilities.destroy', $slot->id) }}" method="POST" onsubmit="return confirm('Delete this availability?')">
                                 @csrf
@@ -47,10 +48,10 @@
                 <form method="POST" action="{{ route('admin.availabilities.store', $doctor->id) }}">
                     @csrf
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Day of Week</label>
-                            <select name="day_of_week" class="form-select w-full mt-1 rounded">
+                            <select name="day_of_week" class="form-select w-full mt-1 rounded" required>
                                 @foreach ($daysOfWeek as $day)
                                     <option value="{{ $day }}">{{ $day }}</option>
                                 @endforeach
@@ -59,12 +60,17 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Start Time</label>
-                            <input type="time" name="start_time" class="form-input w-full mt-1 rounded">
+                            <input type="time" name="start_time" class="form-input w-full mt-1 rounded" required>
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700">End Time</label>
-                            <input type="time" name="end_time" class="form-input w-full mt-1 rounded">
+                            <input type="time" name="end_time" class="form-input w-full mt-1 rounded" required>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Slot Duration (minutes)</label>
+                            <input type="number" name="slot_duration" class="form-input w-full mt-1 rounded" min="5" step="5" required>
                         </div>
                     </div>
 

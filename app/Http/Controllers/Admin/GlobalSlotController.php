@@ -14,7 +14,7 @@ class GlobalSlotController extends Controller
     }
 
     public function update(Request $request)
-    {
+    { 
         $request->validate([
             'start_time' => 'required',
             'end_time' => 'required|after:start_time',
@@ -22,7 +22,8 @@ class GlobalSlotController extends Controller
             'days' => 'required|array',
         ]);
 
-        GlobalTimeSlot::updateOrCreate(['id' => 1], [
+
+        GlobalTimeSlot::updateOrCreate([], [
             'start_time' => $request->start_time,
             'end_time' => $request->end_time,
             'slot_duration' => $request->slot_duration,

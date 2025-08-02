@@ -46,6 +46,11 @@ class DoctorRegisterController extends Controller
         ]);
 
         // ✅ Redirect to login
-        return redirect()->route('login')->with('message', 'Doctor registration successful. Please wait for admin approval.');
+        //return redirect()->route('login')->with('message', 'Doctor registration successful. Please wait for admin approval.');
+        // ✅ Redirect to home page
+       // return redirect('/')->with('message', 'Doctor registration successful. Please wait for admin approval.');
+       // return redirect('/')->with('message', 'Doctor registration successful. Please wait for admin approval.');
+return redirect('/')->withSuccess('Doctor registration successful. Please wait for admin approval.');
+
     }
 }
