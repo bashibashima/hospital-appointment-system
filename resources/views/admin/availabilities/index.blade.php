@@ -25,9 +25,20 @@
                                 <strong>{{ $slot->day_of_week }}</strong>:
                                 {{ \Carbon\Carbon::parse($slot->start_time)->format('h:i A') }}
                                 to
+<!-- {{ \Carbon\Carbon::parse($slot->end_time)->format('h:i A') }}
+({{ \Carbon\Carbon::parse($slot->end_time)->diffInMinutes(\Carbon\Carbon::parse($slot->start_time)) }} mins) -->
+
                                 {{ \Carbon\Carbon::parse($slot->end_time)->format('h:i A') }}
                                 <span class="text-sm text-gray-600">({{ $slot->slot_duration }} mins)</span>
                             </div>
+
+@if ($errors->has('slot_exists'))
+    <div class="alert alert-warning">
+        {{ $errors->first('slot_exists') }}
+    </div>
+@endif
+
+                            
                             <form action="{{ route('admin.availabilities.destroy', $slot->id) }}" method="POST" onsubmit="return confirm('Delete this availability?')">
                                 @csrf
                                 @method('DELETE')

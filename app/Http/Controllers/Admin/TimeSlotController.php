@@ -39,26 +39,32 @@ class TimeSlotController extends Controller
     
 
     // Add a new time slot for the doctor
-    public function store(Request $request, Doctor $doctor)
-    {
-       $request->validate([
-    'day_of_week' => 'required|in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday',
-    'start_time' => 'required|date_format:H:i',
-    'end_time' => 'required|date_format:H:i|after:start_time',
-    'slot_duration' => 'required|integer|min:5|max:60',
-]);
+   public function store(Request $request, Doctor $doctor)
+{
+    $request->validate([
+        'day_of_week' => 'required|in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday',
+        'start_time' => 'required|date_format:H:i',
+        'end_time' => 'required|date_format:H:i|after:start_time',
+        'slot_duration' => 'required|integer|min:5|max:60',
+    ]);
 
-Availability::create([
-    'doctor_id' => $doctor->id,
-    'day_of_week' => $request->day_of_week,
-    'start_time' => $request->start_time,
-    'end_time' => $request->end_time,
-    'slot_duration' => $request->slot_duration,
-]);
+    // Check if doctor already has a slot for the same week (same day allowed or not?)
+    $existing = Availability::where('doctor_id', $doctor->id)->exists();
 
-
-        return back()->with('success', 'Time slot added successfully.');
+    if ($existing) {
+        return back()->withErrors(['slot_exists' => 'This doctor already has a weekly availability set. Only one per week is allowed.']);
     }
+
+    Availability::create([
+        'doctor_id' => $doctor->id,
+        'day_of_week' => $request->day_of_week,
+        'start_time' => $request->start_time,
+        'end_time' => $request->end_time,
+        'slot_duration' => $request->slot_duration,
+    ]);
+
+    return back()->with('success', 'Time slot added successfully.');
+}
 
     // Delete a time slot
     public function destroy($id)
