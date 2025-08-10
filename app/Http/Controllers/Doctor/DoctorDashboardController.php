@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Doctor;
    use App\Models\Appointment;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 
-class DoctorController extends Controller
+class DoctorDashboardController extends Controller
 {
     //
     public function index()

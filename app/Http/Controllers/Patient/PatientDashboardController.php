@@ -19,6 +19,6 @@ class PatientDashboardController extends Controller
             ->latest()
             ->get();
 
-        return view('patient.dashboard', compact('user', 'appointments'));
+        return view('/patient.dashboard', compact('user', 'appointments'));
     }
 }

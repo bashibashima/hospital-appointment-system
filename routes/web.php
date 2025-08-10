@@ -16,7 +16,6 @@ use App\Http\Controllers\Admin\TimeSlotController;
 use App\Http\Controllers\Admin\GlobalSlotController;
 
 // Doctor Controllers
-use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\Doctor\DoctorRegisterController;
 use App\Http\Controllers\Doctor\DoctorDashboardController;
 use App\Http\Controllers\Doctor\AvailabilityController;
@@ -24,6 +23,11 @@ use App\Http\Controllers\Doctor\AvailabilityController;
 // Patient Controllers
 use App\Http\Controllers\Patient\PatientDashboardController;
 use App\Http\Controllers\Patient\AppointmentController;
+
+// Appointment Controllers (Aliased for clarity)
+use App\Http\Controllers\Admin\AppointmentController as AdminAppointmentController;
+use App\Http\Controllers\Doctor\AppointmentController as DoctorAppointmentController;
+use App\Http\Controllers\Patient\AppointmentController as PatientAppointmentController;
 
 // ==========================
 // Public Routes
@@ -37,9 +41,9 @@ Route::get('/doctor/register', [DoctorRegisterController::class, 'create'])->nam
 Route::post('/doctor/register', [DoctorRegisterController::class, 'store'])->name('doctor.register.submit');
 
 // ==========================
-// Post-Login Redirect
+// Unified Dashboard Redirect
 // ==========================
-Route::get('/redirect', function () {
+Route::get('/dashboard', function () {
     $user = auth()->user();
 
     if ($user->role === 'doctor' && $user->status !== 'approved') {
@@ -50,12 +54,12 @@ Route::get('/redirect', function () {
     }
 
     return match ($user->role) {
-        'admin' => redirect('/admin/dashboard'),
-        'doctor' => redirect('/doctor/dashboard'),
-        'patient' => redirect('/patient/dashboard'),
-        default => abort(403),
+        'admin'   => redirect()->route('admin.dashboard'),
+        'doctor'  => redirect()->route('doctor.dashboard'),
+        'patient' => redirect()->route('patient.dashboard'),
+        default   => abort(403),
     };
-})->middleware('auth');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
 // ==========================
 // Profile Routes
@@ -71,7 +75,6 @@ Route::middleware('auth')->group(function () {
 // ==========================
 Route::middleware(['auth', 'is_admin'])->prefix('admin')->name('admin.')->group(function () {
 
-    // Dashboard
     Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
 
     // User Management
@@ -103,17 +106,16 @@ Route::middleware(['auth', 'is_admin'])->prefix('admin')->name('admin.')->group(
 // Doctor Routes
 // ==========================
 Route::middleware(['auth', 'is_doctor'])->prefix('doctor')->group(function () {
-    Route::get('/dashboard', [DoctorController::class, 'index'])->name('doctor.dashboard');
+    Route::get('/dashboard', [DoctorDashboardController::class, 'index'])->name('doctor.dashboard');
 
     // Availability
     Route::get('/availability', [AvailabilityController::class, 'index'])->name('doctor.availability');
-    Route::post('/availability', [AvailabilityController::class, 'store'])->name('availability.store');
     Route::delete('/availability/{id}', [AvailabilityController::class, 'destroy'])->name('availability.delete');
 
     // Appointment Actions
-    Route::post('/appointments/{id}/accept', [DoctorController::class, 'acceptAppointment'])->name('doctor.appointments.accept');
-    Route::post('/appointments/{id}/reject', [DoctorController::class, 'rejectAppointment'])->name('doctor.appointments.reject');
-    Route::post('/appointments/{id}/reschedule', [DoctorController::class, 'rescheduleAppointment'])->name('doctor.appointments.reschedule');
+    Route::post('/appointments/{id}/accept', [DoctorDashboardController::class, 'acceptAppointment'])->name('doctor.appointments.accept');
+    Route::post('/appointments/{id}/reject', [DoctorDashboardController::class, 'rejectAppointment'])->name('doctor.appointments.reject');
+    Route::post('/appointments/{id}/reschedule', [DoctorDashboardController::class, 'rescheduleAppointment'])->name('doctor.appointments.reschedule');
 });
 
 // ==========================
@@ -122,18 +124,17 @@ Route::middleware(['auth', 'is_doctor'])->prefix('doctor')->group(function () {
 Route::middleware(['auth', 'is_patient'])->prefix('patient')->name('patient.')->group(function () {
     Route::get('/dashboard', [PatientDashboardController::class, 'index'])->name('dashboard');
 
-    Route::get('/appointments', [AppointmentController::class, 'index'])->name('appointments');
-    Route::get('/appointments/create', [AppointmentController::class, 'create'])->name('appointments.create');
-    Route::post('/appointments', [AppointmentController::class, 'store'])->name('appointments.store');
+    Route::get('/appointments', [PatientAppointmentController::class, 'index'])->name('appointments');
+    Route::get('/appointments/create', [PatientAppointmentController::class, 'create'])->name('appointments.create');
+    Route::post('/appointments', [PatientAppointmentController::class, 'store'])->name('appointments.store');
 
-    Route::get('/available-slots', [AppointmentController::class, 'showAvailableSlots'])->name('available.slots');
-    Route::get('/get-available-slots', [AppointmentController::class, 'getAvailableSlots'])->name('get.available.slots');
+    Route::get('/available-slots', [PatientAppointmentController::class, 'showAvailableSlots'])->name('available.slots');
+    Route::get('/get-available-slots', [PatientAppointmentController::class, 'getAvailableSlots'])->name('get.available.slots');
 });
 
 // ==========================
 // Miscellaneous Routes
 // ==========================
-Route::get('/dashboard', fn () => view('dashboard'))->middleware(['auth', 'verified'])->name('dashboard');
 
 // Test Email
 Route::get('/test-email', function () {
@@ -144,5 +145,4 @@ Route::get('/test-email', function () {
     return '✅ Approval email sent to doctor!';
 });
 
-// Breeze Auth Routes
 require __DIR__.'/auth.php';

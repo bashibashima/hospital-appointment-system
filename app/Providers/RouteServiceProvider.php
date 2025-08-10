@@ -11,8 +11,8 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @var string
      */
-    public const HOME = '/redirect'; // 🔁 Redirect path after login
-
+   //public const HOME = '/redirect'; // 🔁 Redirect path after login
+   public const HOME ='/patient/dashboard';
     /**
      * Register any application services.
      */

@@ -24,6 +24,12 @@ class SlotHelper
         if ($availabilities->isEmpty()) {
             $availabilities = GlobalAvailability::where('day_of_week', $dayOfWeek)->get();
         }
+// if ($availabilities->isEmpty()) {
+//     $day = Carbon::parse($date)->format('l');
+//     $availabilities = GlobalTimeSlot::whereJsonContains('days', $day)->get();
+// }
+
+
 
         // Step 3: Get already booked times
         $bookedSlots = Appointment::where('doctor_id', $doctorId)

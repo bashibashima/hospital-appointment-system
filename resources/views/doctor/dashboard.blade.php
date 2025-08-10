@@ -37,10 +37,7 @@
                                     <td class="px-4 py-2">
                                         <div class="flex flex-wrap gap-2">
                                             @if($appointment->status === 'pending')
-                                                <form action="{{ route('doctor.appointments.accept', $appointment->id) }}" method="POST">
-                                                    @csrf
-                                                    <button class="text-green-600 hover:underline">Accept</button>
-                                                </form>
+                                
                                                 <form action="{{ route('doctor.appointments.reject', $appointment->id) }}" method="POST">
                                                     @csrf
                                                     <button class="text-red-600 hover:underline">Reject</button>

@@ -1,62 +1,72 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="text-xl font-semibold">Manage Time Slots for Dr. {{ $doctor->user->name }}</h2>
+        <h2 class="text-xl font-semibold leading-tight">
+            Doctor Availability
+        </h2>
     </x-slot>
 
-    <div class="p-4">
-        @if (session('success'))
-            <div class="bg-green-100 text-green-700 p-2 rounded mb-4">{{ session('success') }}</div>
-        @endif
+    <div class="py-6">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
-        <!-- Add Slot Form -->
-        <form method="POST" action="{{ route('admin.availabilities.store', $doctor->id) }}" class="mb-6">
-            @csrf
-            <div class="flex gap-4 items-center">
-                <div>
-                    <label>Day of Week:</label>
-                    <select name="day_of_week" class="border rounded p-1">
-                        @foreach ($daysOfWeek as $day)
-                            <option value="{{ $day }}">{{ $day }}</option>
-                        @endforeach
-                    </select>
+            @if ($availabilities->isEmpty())
+                <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded mb-4">
+                    No availability set by admin for you yet.
+                </div>
+            @else
+                <!-- Top Slot Info -->
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6 p-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-gray-800">
+                        <div>
+                            <span class="font-semibold">Day:</span>
+                            {{ \Carbon\Carbon::parse($availabilities->first()->day_of_week)->format('l') }}
+                        </div>
+                        <div>
+                            <span class="font-semibold">Time Slot:</span>
+                            {{ $availabilities->first()->time_slot }}
+                        </div>
+                        <div>
+                            <span class="font-semibold">Duration:</span>
+                            {{ $availabilities->first()->duration ?? '15 minutes' }}
+                        </div>
+                    </div>
                 </div>
 
-                <div>
-                    <label>Time Slot:</label>
-                    <input type="text" name="time_slot" placeholder="e.g., 10:00 AM - 11:00 AM" class="border rounded p-1" required>
+                <!-- Availability Table -->
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-4">
+                        <h3 class="text-lg font-semibold mb-4">Remaining Slots</h3>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200 border">
+                                <thead class="bg-gray-100 text-left text-sm font-semibold text-gray-700">
+                                    <tr>
+                                        <th class="px-4 py-2 border">#</th>
+                                        <th class="px-4 py-2 border">Day</th>
+                                        <th class="px-4 py-2 border">Time Slot</th>
+                                        <th class="px-4 py-2 border">Duration</th>
+                                        <th class="px-4 py-2 border">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100 text-sm text-gray-800">
+                                    @foreach ($availabilities as $index => $slot)
+                                        <tr>
+                                            <td class="px-4 py-2 border">{{ $index + 1 }}</td>
+                                            <td class="px-4 py-2 border">{{ \Carbon\Carbon::parse($slot->day_of_week)->format('l') }}</td>
+                                            <td class="px-4 py-2 border">{{ $slot->time_slot }}</td>
+                                            <td class="px-4 py-2 border">{{ $slot->duration ?? '15 minutes' }}</td>
+                                            <td class="px-4 py-2 border">
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                                                    Available
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
+            @endif
 
-                <button type="submit" class="bg-blue-500 text-white px-4 py-1 rounded">Add</button>
-            </div>
-        </form>
-
-        <!-- Slot List -->
-        <h3 class="font-semibold mb-2">Existing Slots</h3>
-        <table class="w-full border">
-            <thead>
-                <tr class="bg-gray-200">
-                    <th class="border px-4 py-2">Day</th>
-                    <th class="border px-4 py-2">Time Slot</th>
-                    <th class="border px-4 py-2">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($availabilities as $availability)
-                    <tr>
-                        <td class="border px-4 py-2">{{ $availability->day_of_week }}</td>
-                        <td class="border px-4 py-2">{{ $availability->time_slot }}</td>
-                        <td class="border px-4 py-2">
-                            <form method="POST" action="{{ route('admin.availabilities.destroy', $availability->id) }}">
-                                @csrf
-                                @method('DELETE')
-                                <button class="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
-                            </form>
-                        </td>
-                    </tr>
-                @empty
-                    <tr><td colspan="3" class="text-center py-2">No time slots found.</td></tr>
-                @endforelse
-            </tbody>
-        </table>
+        </div>
     </div>
 </x-app-layout>

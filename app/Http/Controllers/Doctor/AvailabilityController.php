@@ -1,6 +1,6 @@
 <?php 
-namespace App\Http\Controllers\Admin;
-
+namespace App\Http\Controllers\Doctor;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Availability;
@@ -9,13 +9,25 @@ use Carbon\Carbon;
 
 class AvailabilityController extends Controller
 {
-    public function index($doctorId)
-    {
-        $doctor = Doctor::findOrFail($doctorId);
-        $availabilities = Availability::where('doctor_id', $doctorId)->get();
 
-        return view('admin.availability.index', compact('doctor', 'availabilities'));
+
+     public function index()
+    {
+       $userId = Auth::id();
+       $doctor = Doctor::where('user_id', $userId)->firstOrFail();
+       $availabilities = Availability::where('doctor_id', $doctor->id)->get();
+
+        $daysOfWeek = [
+              'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
+         ];
+        return view('doctor.availability.index', compact('doctor', 'availabilities', 'daysOfWeek'));
     }
+    
+
+
+
+
+
 
     public function store(Request $request, $doctorId)
     {
