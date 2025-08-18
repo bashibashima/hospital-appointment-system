@@ -29,7 +29,9 @@
                                     <td class="border px-4 py-2">
                                         {{ \Carbon\Carbon::parse($appointment->date)->format('d M Y') }}
                                     </td>
-                                    <td class="border px-4 py-2">{{ $appointment->time }}</td>
+                                    <td class="border px-4 py-2">
+                              {{ \Carbon\Carbon::parse($appointment->appointment_time)->format('h:i A') }}
+                             </td>
                                     <td class="border px-4 py-2 capitalize">{{ $appointment->status }}</td>
                                 </tr>
                             @endforeach

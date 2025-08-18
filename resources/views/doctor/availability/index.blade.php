@@ -20,10 +20,7 @@
                             <span class="font-semibold">Day:</span>
                             {{ \Carbon\Carbon::parse($availabilities->first()->day_of_week)->format('l') }}
                         </div>
-                        <div>
-                            <span class="font-semibold">Time Slot:</span>
-                            {{ $availabilities->first()->time_slot }}
-                        </div>
+                       
                         <div>
                             <span class="font-semibold">Duration:</span>
                             {{ $availabilities->first()->duration ?? '15 minutes' }}
@@ -51,7 +48,8 @@
                                         <tr>
                                             <td class="px-4 py-2 border">{{ $index + 1 }}</td>
                                             <td class="px-4 py-2 border">{{ \Carbon\Carbon::parse($slot->day_of_week)->format('l') }}</td>
-                                            <td class="px-4 py-2 border">{{ $slot->time_slot }}</td>
+                                            <td class="px-4 py-2 border"> {{ \Carbon\Carbon::parse($slot->start_time)->format('h:i A') }} to
+                                               {{ \Carbon\Carbon::parse($slot->end_time)->format('h:i A') }} </td>
                                             <td class="px-4 py-2 border">{{ $slot->duration ?? '15 minutes' }}</td>
                                             <td class="px-4 py-2 border">
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">

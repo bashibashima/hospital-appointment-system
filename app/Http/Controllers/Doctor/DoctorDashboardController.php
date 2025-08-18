@@ -1,74 +1,64 @@
 <?php
 
 namespace App\Http\Controllers\Doctor;
-   use App\Models\Appointment;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 
+use App\Http\Controllers\Controller; 
+use Illuminate\Http\Request;
+use App\Models\Appointment;
+use App\Models\Availability;
+use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class DoctorDashboardController extends Controller
 {
-    //
     public function index()
     {
-          
-    $appointments = Appointment::with('patient')
-        ->where('doctor_id', auth()->id()) // Get only current doctor's appointments
-        ->latest()
-        ->get();
+        $doctorId = Auth::user()->id;
 
-    return view('doctor.dashboard', compact('appointments'));
+        // Auto-mark past accepted appointments as completed
+        Appointment::where('doctor_id', $doctorId)
+            ->where('status', 'accepted')
+            ->whereDate('appointment_date', '<', today())
+            ->update(['status' => 'completed']);
 
+        // Stats
+        $totalAppointments = Appointment::where('doctor_id', $doctorId)->count();
+        $pendingAppointments = Appointment::where('doctor_id', $doctorId)->where('status', 'pending')->count();
+        $acceptedAppointments = Appointment::where('doctor_id', $doctorId)->where('status', 'accepted')->count();
+
+        // Today's slots
+        $todaysSlots = Availability::where('doctor_id', $doctorId)
+            ->where('day_of_week', strtolower(now()->format('l')))
+            ->get();
+
+        // Today's appointments
+        $todaysAppointments = Appointment::with('patient')
+            ->where('doctor_id', $doctorId)
+            ->whereDate('appointment_date', today())
+            ->get();
+
+        // Latest 5 appointments
+        $latestAppointments = Appointment::with('patient')
+            ->where('doctor_id', $doctorId)
+            ->orderBy('appointment_date', 'desc')
+            ->limit(5)
+            ->get();
+
+        // Past appointments
+        $pastAppointments = Appointment::with('patient')
+            ->where('doctor_id', $doctorId)
+            ->whereDate('appointment_date', '<', today())
+            ->orderBy('appointment_date', 'desc')
+            ->get();
+
+        return view('doctor.dashboard', compact(
+            'totalAppointments',
+            'pendingAppointments',
+            'acceptedAppointments',
+            'todaysSlots',
+            'todaysAppointments',
+            'latestAppointments',
+            'pastAppointments'
+        ));
     }
-
-public function dashboard()
-{
-    $doctor = auth()->user(); // The logged-in doctor
-
-    $appointments = \App\Models\Appointment::with('patient')
-        ->where('doctor_id', $doctor->id)
-        ->orderBy('appointment_date', 'desc')
-        ->get();
-
-    return view('doctor.dashboard', compact('appointments'));
-}
-
-
-public function acceptAppointment($id)
-{
-    $appointment = Appointment::findOrFail($id);
-    $appointment->status = 'accepted';
-    $appointment->save();
-
-    return back()->with('success', 'Appointment accepted successfully.');
-}
-
-public function rejectAppointment($id)
-{
-    $appointment = Appointment::findOrFail($id);
-    $appointment->status = 'rejected';
-    $appointment->save();
-
-    return back()->with('error', 'Appointment rejected.');
-}
-
-public function rescheduleAppointment(Request $request, $id)
-{
-    $request->validate([
-        'date' => 'required|date',
-        'time' => 'required',
-    ]);
-
-    $appointment = Appointment::findOrFail($id);
-    $appointment->appointment_date = $request->date;
-    $appointment->appointment_time = $request->time;
-    $appointment->status = 'rescheduled';
-    $appointment->save();
-
-    return back()->with('success', 'Appointment rescheduled.');
-}
-
-
-
-
 }

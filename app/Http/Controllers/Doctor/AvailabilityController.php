@@ -23,12 +23,6 @@ class AvailabilityController extends Controller
         return view('doctor.availability.index', compact('doctor', 'availabilities', 'daysOfWeek'));
     }
     
-
-
-
-
-
-
     public function store(Request $request, $doctorId)
     {
         $request->validate([

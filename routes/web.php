@@ -105,28 +105,30 @@ Route::middleware(['auth', 'is_admin'])->prefix('admin')->name('admin.')->group(
 // ==========================
 // Doctor Routes
 // ==========================
-Route::middleware(['auth', 'is_doctor'])->prefix('doctor')->group(function () {
-    Route::get('/dashboard', [DoctorDashboardController::class, 'index'])->name('doctor.dashboard');
+
+Route::middleware(['auth', 'is_doctor'])->prefix('doctor')->name('doctor.')->group(function () {
+    Route::get('/dashboard', [DoctorDashboardController::class, 'index'])->name('dashboard');
 
     // Availability
-    Route::get('/availability', [AvailabilityController::class, 'index'])->name('doctor.availability');
+    Route::get('/availability', [AvailabilityController::class, 'index'])->name('availability');
     Route::delete('/availability/{id}', [AvailabilityController::class, 'destroy'])->name('availability.delete');
 
     // Appointment Actions
-    Route::post('/appointments/{id}/accept', [DoctorDashboardController::class, 'acceptAppointment'])->name('doctor.appointments.accept');
-    Route::post('/appointments/{id}/reject', [DoctorDashboardController::class, 'rejectAppointment'])->name('doctor.appointments.reject');
-    Route::post('/appointments/{id}/reschedule', [DoctorDashboardController::class, 'rescheduleAppointment'])->name('doctor.appointments.reschedule');
+    Route::post('/appointments/{id}/accept', [DoctorAppointmentController::class, 'accept'])->name('appointments.accept');
+    Route::post('/appointments/{id}/reject', [DoctorAppointmentController::class, 'reject'])->name('appointments.reject');
+    Route::post('/appointments/{id}/reschedule', [DoctorAppointmentController::class, 'reschedule'])->name('appointments.reschedule');
 });
 
 // ==========================
 // Patient Routes
 // ==========================
+
 Route::middleware(['auth', 'is_patient'])->prefix('patient')->name('patient.')->group(function () {
     Route::get('/dashboard', [PatientDashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/appointments', [PatientAppointmentController::class, 'index'])->name('appointments');
     Route::get('/appointments/create', [PatientAppointmentController::class, 'create'])->name('appointments.create');
-    Route::post('/appointments', [PatientAppointmentController::class, 'store'])->name('appointments.store');
+    Route::post('/appointments/book', [PatientAppointmentController::class, 'book'])->name('appointments.book');
 
     Route::get('/available-slots', [PatientAppointmentController::class, 'showAvailableSlots'])->name('available.slots');
     Route::get('/get-available-slots', [PatientAppointmentController::class, 'getAvailableSlots'])->name('get.available.slots');

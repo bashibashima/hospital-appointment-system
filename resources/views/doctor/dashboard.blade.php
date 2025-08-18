@@ -5,59 +5,134 @@
         </h2>
     </x-slot>
 
-    <div class="py-8">
+    <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                <h3 class="text-lg font-bold mb-4">Upcoming Appointments</h3>
 
-                @if ($appointments->isEmpty())
-                    <p class="text-gray-600">No appointments scheduled yet.</p>
+            <!-- Stats Row -->
+            <div class="grid grid-cols-3 gap-4 mb-6">
+                <div class="bg-white shadow rounded-lg p-4 text-center">
+                    <h3 class="text-lg font-bold">Total Appointments</h3>
+                    <p class="text-2xl">{{ $totalAppointments }}</p>
+                </div>
+                <div class="bg-white shadow rounded-lg p-4 text-center">
+                    <h3 class="text-lg font-bold">Pending</h3>
+                    <p class="text-2xl">{{ $pendingAppointments }}</p>
+                </div>
+                <div class="bg-white shadow rounded-lg p-4 text-center">
+                    <h3 class="text-lg font-bold">Accepted</h3>
+                    <p class="text-2xl">{{ $acceptedAppointments }}</p>
+                </div>
+            </div>
+
+            <!-- Today's Slots -->
+            <div class="bg-white shadow rounded-lg p-4 mb-6">
+                <h3 class="text-lg font-semibold mb-2">Today's Slots</h3>
+                @if($todaysSlots->count() > 0)
+                    <ul>
+                        @foreach($todaysSlots as $slot)
+                            <li>{{ $slot->time_slot }}</li>
+                        @endforeach
+                    </ul>
                 @else
-                    <table class="table-auto w-full text-sm">
-                        <thead>
-                            <tr class="bg-gray-100">
-                                <th class="px-4 py-2 text-left">Patient</th>
-                                <th class="px-4 py-2 text-left">Date</th>
-                                <th class="px-4 py-2 text-left">Time</th>
-                                <th class="px-4 py-2 text-left">Status</th>
-                                <th class="px-4 py-2 text-left">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($appointments as $appointment)
-                                <tr class="border-b">
-                                    <td class="px-4 py-2">{{ $appointment->patient->name ?? 'N/A' }}</td>
-                                    <td class="px-4 py-2">{{ \Carbon\Carbon::parse($appointment->date)->format('d M Y') }}</td>
-                                    
-<td class="px-4 py-2">
-    {{ \Carbon\Carbon::parse($appointment->time)->format('h:i A') }}
-
-
-                                    <td class="px-4 py-2 capitalize">{{ $appointment->status }}</td>
-                                    <td class="px-4 py-2">
-                                        <div class="flex flex-wrap gap-2">
-                                            @if($appointment->status === 'pending')
-                                
-                                                <form action="{{ route('doctor.appointments.reject', $appointment->id) }}" method="POST">
-                                                    @csrf
-                                                    <button class="text-red-600 hover:underline">Reject</button>
-                                                </form>
-                                            @endif
-
-                                            <form action="{{ route('doctor.appointments.reschedule', $appointment->id) }}" method="POST" class="flex gap-2">
-                                                @csrf
-                                                <input type="date" name="date" required class="border rounded px-1 py-0.5 text-sm">
-                                                <input type="time" name="time" required class="border rounded px-1 py-0.5 text-sm">
-                                                <button class="text-blue-600 hover:underline">Reschedule</button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                    <p class="text-gray-500">No slots available today.</p>
                 @endif
             </div>
+
+            <!-- Today's Appointments -->
+            <div class="bg-white shadow rounded-lg p-4 mb-6">
+                <h3 class="text-lg font-semibold mb-2">Today's Appointments</h3>
+                <table class="min-w-full bg-white border rounded-lg">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="py-2 px-4 border">Patient</th>
+                            <th class="py-2 px-4 border">Time</th>
+                            <th class="py-2 px-4 border">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($todaysAppointments as $appointment)
+                            <tr>
+                                <td class="py-2 px-4 border">{{ $appointment->patient->name }}</td>
+                                <td class="py-2 px-4 border">
+                                    {{ \Carbon\Carbon::parse($appointment->appointment_time)->format('g:i A') }}
+                                </td>
+                                <td class="py-2 px-4 border capitalize">{{ $appointment->status }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="3" class="py-2 px-4 text-center text-gray-500">No appointments today.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Latest Appointments -->
+            <div class="bg-white shadow rounded-lg p-4 mb-6">
+                <h3 class="text-lg font-semibold mb-2">Latest Appointments</h3>
+                <table class="min-w-full bg-white border rounded-lg">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="py-2 px-4 border">Patient</th>
+                            <th class="py-2 px-4 border">Date</th>
+                            <th class="py-2 px-4 border">Time</th>
+                            <th class="py-2 px-4 border">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($latestAppointments as $appointment)
+                            <tr>
+                                <td class="py-2 px-4 border">{{ $appointment->patient->name }}</td>
+                                <td class="py-2 px-4 border">
+                                    {{ \Carbon\Carbon::parse($appointment->appointment_date)->format('d M Y') }}
+                                </td>
+                                <td class="py-2 px-4 border">
+                                    {{ \Carbon\Carbon::parse($appointment->appointment_time)->format('g:i A') }}
+                                </td>
+                                <td class="py-2 px-4 border capitalize">{{ $appointment->status }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="py-2 px-4 text-center text-gray-500">No appointments found.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Past Appointments -->
+            <div class="bg-white shadow rounded-lg p-4 mb-6">
+                <h3 class="text-lg font-semibold mb-2">Past Appointments</h3>
+                <table class="min-w-full bg-white border rounded-lg">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="py-2 px-4 border">Patient</th>
+                            <th class="py-2 px-4 border">Date</th>
+                            <th class="py-2 px-4 border">Time</th>
+                            <th class="py-2 px-4 border">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($pastAppointments as $appointment)
+                            <tr>
+                                <td class="py-2 px-4 border">{{ $appointment->patient->name }}</td>
+                                <td class="py-2 px-4 border">
+                                    {{ \Carbon\Carbon::parse($appointment->appointment_date)->format('d M Y') }}
+                                </td>
+                                <td class="py-2 px-4 border">
+                                    {{ \Carbon\Carbon::parse($appointment->appointment_time)->format('g:i A') }}
+                                </td>
+                                <td class="py-2 px-4 border capitalize">{{ $appointment->status }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="py-2 px-4 text-center text-gray-500">No past appointments.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
         </div>
     </div>
 </x-app-layout>
