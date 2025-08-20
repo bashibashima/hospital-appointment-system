@@ -90,12 +90,12 @@ This project provides separate dashboards for **Admin**, **Doctor**, and **Patie
     DB_PASSWORD=
 
 5.**Run migrations**
-  ``` php artisan migrate
+  ```php artisan migrate
 
 6.**Start server**
-   ``` php artisan serve
+   ```php artisan serve
 
-Now open 👉 http://127.0.0.1:8000
+```Now open 👉 http://127.0.0.1:8000
  in your browser.
 
 
