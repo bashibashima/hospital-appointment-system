@@ -1,77 +1,77 @@
-# 🏥 Hospital Appointment Management System – Laravel 12
+# 🏥 Laravel 12 Hospital Appointment System
 
-A modern web-based hospital appointment system built using Laravel 12. This system allows patients to book, cancel, and track appointments, while doctors and admins manage availability and status updates through role-based dashboards.
-
----
-
-## ✨ Key Features
-
-### 👤 Patient Panel
-- Browse doctors and specializations
-- Book, cancel, or reschedule appointments
-- View upcoming & past appointment history
-- Receive email confirmations
-
-### 🩺 Appointment Management
-- Dynamic time slot selection based on doctor availability
-- Status tracking: Pending, Confirmed, Cancelled, Completed
-- Add notes: symptoms, diagnosis, prescriptions
+A **web-based hospital appointment management system** built with **Laravel 12**, **MySQL**, and **Breeze authentication**.  
+This project provides separate dashboards for **Admin**, **Doctor**, and **Patient** roles, enabling easy appointment booking, doctor availability management, and hospital scheduling.
 
 ---
 
-## 💡 Bonus Features (Optional)
-- 🔍 Search doctors by specialization
-- 📄 Export appointment history as PDF
-- 📆 Calendar view with FullCalendar.js
-- 📱 Mobile responsive layout
-- 🌙 Dark/Light theme toggle
+## 🚀 Features
+
+### 🔑 Authentication
+- Laravel Breeze authentication (Login, Register, Forgot Password).
+- Role-based access (Admin, Doctor, Patient).
+- Middleware to protect role-specific routes.
+
+### 👩‍⚕️ Admin Panel
+- Approve or reject doctor registrations.
+- Manage doctor profiles and specializations.
+- Create and manage **global time slots** (e.g., Mon–Fri, 9 AM – 5 PM, 30 min).
+- Assign availability slots to doctors.
+- View statistics: doctors, patients, and appointment counts.
+- Export data (CSV, PDF).
+- Send email notifications to doctors after approval.
+
+### 🩺 Doctor Panel
+- View upcoming, accepted, pending, and completed appointments.
+- Accept / Reject / Reschedule appointments.
+- View **patient history** (past appointments).
+- Profile management (bio, specialization, contact).
+- View assigned availability (set by Admin).
+
+### 👨‍🦱 Patient Panel
+- Book appointments with doctors based on availability.
+- View upcoming and past appointments.
+- Cancel appointments.
+- Add notes/symptoms during booking.
+
+### 📅 Time Slot Management
+- **Admin defines global weekly slots** (start time, end time, duration, working days).
+- System auto-generates slots for doctors.
+- Only free slots are displayed to patients when booking.
+- Booked slots are automatically removed from availability.
+
+### 🔔 Notifications
+- Doctors receive notifications for new bookings, cancellations, and reschedules.
+- Patients receive confirmation/cancellation updates.
 
 ---
 
-## 🛠 Technologies Used
+## 🛠️ Tech Stack
 
-- *Laravel 12* – MVC Architecture
-- *Blade Templates* – UI Views
-- *MySQL* – Relational Database
-- *Eloquent ORM* – Relationships & Soft Deletes
-- *AJAX* – Dynamic availability loading
-- *Laravel Breeze* – Authentication scaffolding
-- *Form Validation* – Secure input handling
-- *Middleware* – Role-based access control
+- **Framework:** Laravel 12
+- **Authentication:** Laravel Breeze
+- **Database:** MySQL (XAMPP)
+- **Frontend:** Blade Templates + TailwindCSS
+- **PDF/CSV Export:** DomPDF / Laravel Excel
+- **Mail:** Laravel Mail (for doctor approval + booking notifications)
 
 ---
 
-## 🗃 Database Schema Overview
+## 📂 Database Schema (Key Tables)
 
-| Table | Description |
-|-------|-------------|
-| users | id, name, email, password, role (admin/doctor/patient),status |
-| specializations | id, name |
-| doctors | id, user_id, specialization_id, bio |
-| availabilities | id, doctor_id, day_of_week, time_slot |
-| appointments | id, patient_id, doctor_id, date, time, status, notes |
-| notifications | Laravel notification system |
+- `users` – Stores Admin, Doctor, and Patient accounts (with role).
+- `specializations` – Stores doctor specialization fields.
+- `doctors` – Links doctors with user_id, specialization_id, and bio.
+- `appointments` – Stores appointments (doctor_id, patient_id, date, time, status).
+- `availabilities` – Doctor availability per day/slot.
+- `global_time_slots` – Stores default slot settings for all doctors.
+- `notifications` – Stores in-app notifications.
 
 ---
 
-## 🚀 Getting Started Locally
+## ⚡ Installation Guide
 
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/hospital-appointment-system.git
-cd hospital-appointment-system
-
-# Install dependencies
-composer install
-
-# Set up environment
-cp .env.example .env
-php artisan key:generate
-
-# Configure your database settings in .env
-
-# Run migrations and seeders
-php artisan migrate --seed
-
-# Serve the app
-php artisan serve
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/hospital-appointment-system.git
+   cd hospital-appointment-system
