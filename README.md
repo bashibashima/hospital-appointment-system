@@ -99,6 +99,11 @@ Now open 👉 http://127.0.0.1:8000
  in your browser.
 
 
+## 👥 User Roles
+
+- **Admin** – Manages doctors, patients, global time slots, approvals, and overall system.  
+- **Doctor** – Manages appointments (accept/reject/reschedule), views patient history, and updates profile.  
+- **Patient** – Books, cancels, and views appointments based on doctor availability.  
 
 
 
