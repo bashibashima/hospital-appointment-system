@@ -51,6 +51,7 @@ class DoctorDashboardController extends Controller
             ->orderBy('appointment_date', 'desc')
             ->get();
 
+            $appointments = Appointment::where('doctor_id', $doctorId)->get();
         return view('doctor.dashboard', compact(
             'totalAppointments',
             'pendingAppointments',
@@ -58,7 +59,23 @@ class DoctorDashboardController extends Controller
             'todaysSlots',
             'todaysAppointments',
             'latestAppointments',
-            'pastAppointments'
+            'pastAppointments',
+             'appointments' 
         ));
     }
+
+ public function patientHistory($id)
+{
+    $appointments = \App\Models\Appointment::with(['doctor','patient'])
+        ->where('patient_id', $id)
+        ->orderBy('appointment_date', 'desc')
+        ->get();
+
+    $patient = \App\Models\User::findOrFail($id); // assuming User model stores patients
+
+    return view('doctor.patient-history', compact('appointments', 'patient'));
+}
+
+
+
 }

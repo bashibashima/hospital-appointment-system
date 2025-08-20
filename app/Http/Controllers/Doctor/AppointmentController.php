@@ -78,4 +78,41 @@ class AppointmentController extends Controller
 
         return back()->with('success', 'Appointment rescheduled successfully!');
     }
+
+
+
+    public function updateDoctorData(Request $request, $id)
+{
+    // Fetch the appointment
+    $appointment = Appointment::findOrFail($id);
+
+    // Only the assigned doctor can update
+    if (auth()->user()->role !== 'doctor' || $appointment->doctor_id !== auth()->id()) {
+        abort(403, 'Unauthorized action.');
+    }
+
+    // Validate inputs
+    $request->validate([
+        'doctor_symptoms' => 'nullable|string|max:5000',
+        'prescriptions'   => 'nullable|string|max:5000',
+    ]);
+
+    // Update doctor data
+    $appointment->doctor_symptoms = $request->doctor_symptoms;
+    $appointment->prescriptions   = $request->prescriptions;
+
+    // Optionally mark as completed
+    if ($appointment->status !== 'completed') {
+        $appointment->status = 'completed';
+    }
+
+    $appointment->save();
+
+    return back()->with('success', 'Doctor symptoms and prescriptions saved successfully.');
+}
+
+
+
+ 
+
 }

@@ -3,8 +3,8 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 10, 2025 at 07:04 AM
--- Server version: 9.4.0P
+-- Generation Time: Aug 18, 2025 at 05:00 PM
+-- Server version: 9.4.0
 -- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -33,11 +33,21 @@ CREATE TABLE `appointments` (
   `doctor_id` bigint UNSIGNED NOT NULL,
   `appointment_date` date NOT NULL,
   `appointment_time` time NOT NULL,
-  `status` enum('pending','confirmed','cancelled','completed') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `status` enum('pending','accepted','completed','cancelled') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
   `notes` text COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `appointments`
+--
+
+INSERT INTO `appointments` (`id`, `patient_id`, `doctor_id`, `appointment_date`, `appointment_time`, `status`, `notes`, `created_at`, `updated_at`) VALUES
+(1, 7, 6, '2025-08-15', '09:00:00', 'completed', NULL, '2025-08-13 06:00:17', '2025-08-18 09:23:06'),
+(2, 7, 5, '2025-08-15', '14:30:00', 'pending', NULL, '2025-08-14 05:58:48', '2025-08-14 05:58:48'),
+(3, 7, 5, '2025-08-14', '12:00:00', 'pending', NULL, '2025-08-14 06:02:05', '2025-08-14 06:02:05'),
+(4, 7, 5, '2025-08-20', '13:00:00', 'pending', NULL, '2025-08-18 09:24:39', '2025-08-18 09:24:39');
 
 -- --------------------------------------------------------
 
@@ -74,14 +84,6 @@ CREATE TABLE `cache` (
   `value` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
   `expiration` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `cache`
---
-
-INSERT INTO `cache` (`key`, `value`, `expiration`) VALUES
-('laravel_cache_patient1@gmail.com|127.0.0.1', 'i:1;', 1754648091),
-('laravel_cache_patient1@gmail.com|127.0.0.1:timer', 'i:1754648091;', 1754648091);
 
 -- --------------------------------------------------------
 
@@ -279,10 +281,8 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('dKM5e8kG5rz8SQNLSQ5kXixTJ6XxqLDuFPQxCMcS', 7, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoiUFpPZGkwTEExb3VGdWIzWGRpdjRMdXdkTmhhSWJnRWg1UTIyNkxQeiI7czozOiJ1cmwiO2E6MDp7fXM6OToiX3ByZXZpb3VzIjthOjE6e3M6MzoidXJsIjtzOjMxOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvZGFzaGJvYXJkIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6Nzt9', 1754741627),
-('hYZBOKAQjHqk4EzOlWvkWKMjJlFQF2PAHoxjmw8C', 6, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiQTJsYlBja3drajZFcDRFcUoxMFF5Wnlqb2YzZmM1dTQ3dVI3Y1NneiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9kb2N0b3IvYXZhaWxhYmlsaXR5Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6Njt9', 1754800036),
-('MMixLighPf7hLHUApkUUB5C8smuCbdPPAvfFsVN1', 7, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoiU25FMjhMUWl4QkpCVTRueXFhVVNybWpobHBnN2N4UGxJSFRWd3ZPUyI7czozOiJ1cmwiO2E6MDp7fXM6OToiX3ByZXZpb3VzIjthOjE6e3M6MzoidXJsIjtzOjMxOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvZGFzaGJvYXJkIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6Nzt9', 1754751147),
-('TYzx7xVDDXxeOQFbtJ5LDgFnEoBf71Eppaj5LPVv', 7, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoiM051RUw5amMwSWhsY1FJd0RKV1EydVE4WGUxdkJJOVh0bFJFeXFOayI7czozOiJ1cmwiO2E6MDp7fXM6OToiX3ByZXZpb3VzIjthOjE6e3M6MzoidXJsIjtzOjM5OiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvcGF0aWVudC9kYXNoYm9hcmQiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aTo3O30=', 1754801759);
+('HOpbUq4VKtAqwDCOKpzs6R17mrtqXaxVGl0LTzun', 7, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 Edg/139.0.0.0', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoidVN5QXNkVFdJMVBQOFhKNjlSVER5NG5CQTF4QUhEMWhzanU0MzB4dCI7czozOiJ1cmwiO2E6MDp7fXM6OToiX3ByZXZpb3VzIjthOjE6e3M6MzoidXJsIjtzOjQyOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvcGF0aWVudC9hcHBvaW50bWVudHMiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aTo3O30=', 1755528893),
+('oNxz0K7n5DBkD9gi7TgQmlgP551hyTKKos6YQKDm', 6, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiQ3RZNEtrdWp0TmljQ2gxOHNmRTdockZyMTU0eWwycVFUNWE3YzZPdyI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mzg6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9kb2N0b3IvZGFzaGJvYXJkIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6Njt9', 1755528821);
 
 -- --------------------------------------------------------
 
@@ -340,8 +340,8 @@ INSERT INTO `users` (`id`, `role`, `name`, `email`, `email_verified_at`, `passwo
 (3, 'patient', 'Hamza', 'hamza@gmail.com', NULL, '$2y$12$pjUY696XlrIp6bhQf8RzJ.WRJ7TT7hNzHtkfDzUOUjZDCgg6ZFmsW', NULL, '2025-07-31 08:28:16', '2025-07-31 08:28:16', 'pending'),
 (4, 'doctor', 'Shameer', 'doctor@gmail.com', NULL, '$2y$12$ayaQQQDeLeDZ70lyRlKLhOJzQOxbYxToVLU/EYCHpuOIHRSjATO1y', NULL, '2025-07-31 09:16:10', '2025-07-31 09:16:10', 'pending'),
 (5, 'doctor', 'Shameena', 'doctor1@gmail.com', NULL, '$2y$12$7j6ff1uKTPaOgP0jm./z5uKYXH/5Agj77WwLZjHqFgojUZSx6cGeq', NULL, '2025-07-31 09:20:18', '2025-08-01 04:36:21', 'approved'),
-(6, 'doctor', 'vidhya', 'bashibashima@gmail.com', NULL, '$2y$12$vcred6CChwkDoDUCBsd5Xu8PkJoKvXW.QO1tkSGfkdxPU1RZogXhi', 'zvZPhpLbALcE54JcoblW1lV3XTPb4gJJNITjr9lKhVN8OQ9zExAKVTeKJ4MT', '2025-07-31 09:22:13', '2025-08-06 05:07:23', 'approved'),
-(7, 'patient', 'rahul', 'bashibashima123@gmail.com', NULL, '$2y$12$s09dHHgBOIRuVaVwD67OjuhBpjcdgtsqL9g54G/MYWSIBHkVm.zPW', NULL, '2025-08-09 00:07:50', '2025-08-09 00:07:50', 'pending');
+(6, 'doctor', 'vidhya', 'bashibashima@gmail.com', NULL, '$2y$12$vcred6CChwkDoDUCBsd5Xu8PkJoKvXW.QO1tkSGfkdxPU1RZogXhi', 'zrQcSotANATpBoN6PM17H23zHvRFctW73p10WqA8lffXo2L1tuMqaXQV7Rmu', '2025-07-31 09:22:13', '2025-08-06 05:07:23', 'approved'),
+(7, 'patient', 'Rahul', 'bashibashima123@gmail.com', NULL, '$2y$12$s09dHHgBOIRuVaVwD67OjuhBpjcdgtsqL9g54G/MYWSIBHkVm.zPW', NULL, '2025-08-09 00:07:50', '2025-08-09 00:07:50', 'pending');
 
 --
 -- Indexes for dumped tables
@@ -455,7 +455,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `appointments`
 --
 ALTER TABLE `appointments`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `availabilities`

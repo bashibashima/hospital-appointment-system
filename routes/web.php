@@ -117,6 +117,13 @@ Route::middleware(['auth', 'is_doctor'])->prefix('doctor')->name('doctor.')->gro
     Route::post('/appointments/{id}/accept', [DoctorAppointmentController::class, 'accept'])->name('appointments.accept');
     Route::post('/appointments/{id}/reject', [DoctorAppointmentController::class, 'reject'])->name('appointments.reject');
     Route::post('/appointments/{id}/reschedule', [DoctorAppointmentController::class, 'reschedule'])->name('appointments.reschedule');
+
+    //doctor add symtoms and precription
+    Route::post('/appointments/{id}/update', [DoctorAppointmentController::class, 'updateDoctorData'])->name('appointments.update');
+    //view patient history
+    Route::get('/doctor/patient/{id}/history', [DoctorDashboardController::class, 'patientHistory'])
+    ->name('patient.history');
+
 });
 
 // ==========================
