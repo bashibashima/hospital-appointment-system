@@ -18,7 +18,7 @@ This project provides separate dashboards for **Admin**, **Doctor**, and **Patie
 - Create and manage **global time slots** (e.g., Mon–Fri, 9 AM – 5 PM, 30 min).
 - Assign availability slots to doctors.
 - View statistics: doctors, patients, and appointment counts.
-- Export data (CSV, PDF).
+-  View and manage doctor, patient, and appointment records.
 - Send email notifications to doctors after approval.
 
 ### 🩺 Doctor Panel
@@ -52,7 +52,6 @@ This project provides separate dashboards for **Admin**, **Doctor**, and **Patie
 - **Authentication:** Laravel Breeze
 - **Database:** MySQL (XAMPP)
 - **Frontend:** Blade Templates + TailwindCSS
-- **PDF/CSV Export:** DomPDF / Laravel Excel
 - **Mail:** Laravel Mail (for doctor approval + booking notifications)
 
 ---
@@ -75,3 +74,38 @@ This project provides separate dashboards for **Admin**, **Doctor**, and **Patie
    ```bash
    git clone https://github.com/yourusername/hospital-appointment-system.git
    cd hospital-appointment-system
+   
+2. **Install dependencies**
+   ```bash
+   composer install
+   npm install && npm run dev
+
+3. **Setup environment**
+   cp .env.example .env
+   php artisan key:generate
+
+4.**Configure database in .env**
+    DB_DATABASE=healthcare_db
+   DB_USERNAME=root
+    DB_PASSWORD=
+
+5.**Run migrations**
+   php artisan migrate
+
+6.**Start server**
+    php artisan serve
+
+Now open 👉 http://127.0.0.1:8000
+ in your browser.
+
+
+
+
+
+
+
+
+  
+
+
+
