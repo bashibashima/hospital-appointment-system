@@ -106,7 +106,10 @@ Now open 👉 http://127.0.0.1:8000
 - **Patient** – Books, cancels, and views appointments based on doctor availability.  
 
 
+📜 License
 
+This project is licensed under the MIT License.
+You are free to use, modify, and share it.
 
 
 
