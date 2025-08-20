@@ -84,15 +84,15 @@ This project provides separate dashboards for **Admin**, **Doctor**, and **Patie
    ```cp .env.example .env
    php artisan key:generate
 
-4.**Configure database in .env**
+4. **Configure database in .env**
     ```DB_DATABASE=healthcare_db
-   DB_USERNAME=root
+     DB_USERNAME=root
     DB_PASSWORD=
 
-5.**Run migrations**
+5. **Run migrations**
   ```php artisan migrate
 
-6.**Start server**
+6.  **Start server**
    ```php artisan serve
 
 ```Now open 👉 http://127.0.0.1:8000
