@@ -11,12 +11,11 @@ class DatabaseSeeder extends Seeder
     /**
      * Seed the application's database.
      */
-    public function run(): void
-    {
-        // User::factory(10)->create();
-$this->call(SpecializationSeeder::class);
-
-        
-
-    }
+   public function run(): void
+{
+    $this->call([
+        SpecializationSeeder::class, // keeps your specialization data
+        SampleDataSeeder::class,     // truncates + adds sample data
+    ]);
+}
 }
