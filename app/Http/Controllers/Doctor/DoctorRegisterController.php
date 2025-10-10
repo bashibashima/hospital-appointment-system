@@ -21,19 +21,28 @@ class DoctorRegisterController extends Controller
     // Handle the form submission
     public function store(Request $request)
     {
+        // ✅ Validate input
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
+            'phone' => ['required', 'regex:/^(\+?\d{10,15})$/'], // Indian or international
             'password' => 'required|confirmed|min:6',
             'specialization_id' => 'required|exists:specializations,id',
             'bio' => 'nullable|string|max:1000',
         ]);
+
+        // ✅ Format phone
+        $phone = ltrim($request->phone, '0'); // Remove leading zero
+        if (!str_starts_with($phone, '+')) {
+            $phone = '+91' . $phone; // Assume Indian number
+        }
 
         // ✅ Save user
         $user = User::create([
             'role' => 'doctor',
             'name' => $request->name,
             'email' => $request->email,
+            'phone' => $phone,
             'password' => Hash::make($request->password),
             'status' => 'pending', // Awaiting admin approval
         ]);
@@ -45,12 +54,7 @@ class DoctorRegisterController extends Controller
             'bio' => $request->bio,
         ]);
 
-        // ✅ Redirect to login
-        //return redirect()->route('login')->with('message', 'Doctor registration successful. Please wait for admin approval.');
-        // ✅ Redirect to home page
-       // return redirect('/')->with('message', 'Doctor registration successful. Please wait for admin approval.');
-       // return redirect('/')->with('message', 'Doctor registration successful. Please wait for admin approval.');
-return redirect('/')->withSuccess('Doctor registration successful. Please wait for admin approval.');
-
+        // ✅ Redirect with success message
+        return redirect('/')->withSuccess('Doctor registration successful. Please wait for admin approval.');
     }
 }

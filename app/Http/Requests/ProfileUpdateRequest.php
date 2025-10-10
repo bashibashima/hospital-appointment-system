@@ -25,6 +25,33 @@ class ProfileUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
+            'phone' => [
+                'nullable',
+                'regex:/^\+?[1-9]\d{9,14}$/', // E.164 format (+ followed by 10-15 digits)
+            ],
         ];
+    }
+
+    /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        if ($this->phone) {
+            $phone = preg_replace('/\D/', '', $this->phone); // keep only digits
+
+            // If 10-digit number (Indian mobile), prepend +91
+            if (preg_match('/^[6-9]\d{9}$/', $phone)) {
+                $this->merge([
+                    'phone' => '+91' . $phone,
+                ]);
+            }
+            // If already starts with + (international), keep as is
+            elseif (preg_match('/^\+/', $this->phone)) {
+                $this->merge([
+                    'phone' => $this->phone,
+                ]);
+            }
+        }
     }
 }

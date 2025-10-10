@@ -58,10 +58,19 @@
                 </select>
             </div>
 
-            <div class="mb-4">
-                <label class="block font-medium">Date</label>
-                <input type="date" name="appointment_date" id="appointment_date" onchange="fetchAvailableSlots()" class="w-full border rounded p-2" required>
-            </div>
+           <div class="mb-4">
+    <label class="block font-medium">Date</label>
+    <input 
+        type="date" 
+        name="appointment_date" 
+        id="appointment_date" 
+        onchange="fetchAvailableSlots()" 
+        class="w-full border rounded p-2" 
+        required
+        min="{{ date('Y-m-d') }}"
+    >
+</div>
+
 
             <div class="mb-4">
                 <label class="block font-medium">Time Slot</label>

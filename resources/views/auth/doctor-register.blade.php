@@ -35,6 +35,10 @@
             <label class="block mt-4 text-sm">Email</label>
             <input type="email" name="email" value="{{ old('email') }}" required class="w-full border rounded p-2 mt-1">
 
+
+             <label class="block mt-4 text-sm">Phone</label>
+            <input type="text" name="phone" value="{{ old('phone') }}" required placeholder="9876543210" class="w-full border rounded p-2 mt-1">
+
             <label class="block mt-4 text-sm">Password</label>
             <input type="password" name="password" required class="w-full border rounded p-2 mt-1">
 

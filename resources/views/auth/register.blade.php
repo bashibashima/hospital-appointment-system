@@ -1,4 +1,5 @@
 <x-guest-layout>
+    <h2 class="text-2xl font-bold text-center mb-6">Patient Registration</h2>
     <form method="POST" action="{{ route('register') }}">
         @csrf
 
@@ -15,6 +16,16 @@
             <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
+
+
+
+        <!-- Phone -->
+    <div>
+            <x-input-label for="phone" :value="__('Phone')" />
+            <x-text-input id="phone" class="block mt-1 w-full" type="text" name="phone" :value="old('phone')" required />
+            <x-input-error :messages="$errors->get('phone')" class="mt-2" />
+    </div>
+
 
         <!-- Password -->
         <div class="mt-4">
