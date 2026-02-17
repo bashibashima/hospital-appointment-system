@@ -20,22 +20,28 @@
                                 <th class="px-4 py-2">Status</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @foreach ($appointments as $appointment)
-                                <tr>
-                                    <td class="border px-4 py-2">
-                                        {{ $appointment->doctor->name ?? 'N/A' }}
-                                    </td>
-                                    <td class="border px-4 py-2">
-                                        {{ \Carbon\Carbon::parse($appointment->date)->format('d M Y') }}
-                                    </td>
-                                    <td class="border px-4 py-2">
-                              {{ \Carbon\Carbon::parse($appointment->appointment_time)->format('h:i A') }}
-                             </td>
-                                    <td class="border px-4 py-2 capitalize">{{ $appointment->status }}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
+                       <tbody>
+@foreach ($appointments as $appointment)
+    <tr>
+        <td class="border px-4 py-2">
+            {{ $appointment->doctor->name ?? 'N/A' }}
+        </td>
+
+        <td class="border px-4 py-2">
+            {{ \Carbon\Carbon::parse($appointment->appointment_date)->format('d M Y') }}
+        </td>
+
+        <td class="border px-4 py-2">
+            {{ \Carbon\Carbon::createFromFormat('H:i:s', $appointment->appointment_time)->format('h:i A') }}
+        </td>
+
+        <td class="border px-4 py-2 capitalize">
+            {{ $appointment->status }}
+        </td>
+    </tr>
+@endforeach
+</tbody>
+
                     </table>
                 @endif
             </div>

@@ -2,40 +2,55 @@
 
 namespace App\Helpers;
 
-use App\Models\Appointment;
 use Carbon\Carbon;
+use App\Models\Appointment;
 
 class SlotHelper
 {
-    public static function generateSlots($doctorId, $date)
-    {
-        $start = Carbon::parse($date . ' 09:00:00'); // clinic start time
-        $end = Carbon::parse($date . ' 17:00:00');   // clinic end time
-        $duration = 30; // slot duration in minutes
+    /**
+     * Generate available slots for a doctor on a given date
+     */
+    public static function getAvailableSlots($doctorId, $date)
+{
+    $slots = [];
 
-        $slots = [];
-        $appointments = Appointment::where('doctor_id', $doctorId)
-            ->whereDate('appointment_date', $date)
-            ->get()
-            ->keyBy('appointment_time');
+    $startTime = Carbon::createFromTime(9, 0);   // 9:00 AM
+    $endTime   = Carbon::createFromTime(17, 0);  // 5:00 PM
+    $slotDuration = 15;
 
-        while ($start->lt($end)) {
-            $slotStart = $start->copy();
-            $slotEnd = $start->copy()->addMinutes($duration);
+    // No Sunday
+    if (Carbon::parse($date)->isSunday()) {
+        return [];
+    }
 
-            $isBooked = $appointments->has($slotStart->format('H:i:s'));
+    // Already booked slots
+    $bookedSlots = Appointment::where('doctor_id', $doctorId)
+        ->where('appointment_date', $date)
+        ->pluck('appointment_time')
+        ->toArray();
 
-            $slots[] = [
-                'start' => $slotStart->format('H:i:s'),
-                'end' => $slotEnd->format('H:i:s'),
-                'start_display' => $slotStart->format('g:i A'),
-                'end_display' => $slotEnd->format('g:i A'),
-                'booked' => $isBooked,
-            ];
+    $current = $startTime->copy();
 
-            $start->addMinutes($duration);
+    while ($current->lt($endTime)) {
+
+        $slot = $current->format('H:i:s');
+
+        // 🔑 combine DATE + TIME
+        $slotDateTime = Carbon::parse($date . ' ' . $slot);
+
+        // Skip booked slots
+        if (!in_array($slot, $bookedSlots)) {
+
+            // Skip past datetime (works for today & future)
+            if (!$slotDateTime->isPast()) {
+                $slots[] = $slot;
+            }
         }
 
-        return $slots;
+        $current->addMinutes($slotDuration);
     }
+
+    return $slots;
+}
+
 }

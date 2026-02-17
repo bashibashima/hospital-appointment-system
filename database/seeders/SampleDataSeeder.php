@@ -49,16 +49,7 @@ class SampleDataSeeder extends Seeder
             'updated_at' => now(),
         ]);
 
-        // 4️⃣ Availability for Doctor
-        DB::table('availabilities')->insert([
-            'doctor_id' => $doctorId,
-            'day_of_week' => 'Monday',
-            'start_time' => '09:00:00',
-            'end_time' => '12:00:00',
-            'slot_duration' => 30,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+       
 
         // 5️⃣ Appointment
         DB::table('appointments')->insert([

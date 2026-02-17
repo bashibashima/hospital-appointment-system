@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Doctor;
 use App\Http\Controllers\Controller; 
 use Illuminate\Http\Request;
 use App\Models\Appointment;
-use App\Models\Availability;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
@@ -26,11 +25,7 @@ class DoctorDashboardController extends Controller
         $pendingAppointments = Appointment::where('doctor_id', $doctorId)->where('status', 'pending')->count();
         $acceptedAppointments = Appointment::where('doctor_id', $doctorId)->where('status', 'accepted')->count();
 
-        // Today's slots
-        $todaysSlots = Availability::where('doctor_id', $doctorId)
-            ->where('day_of_week', strtolower(now()->format('l')))
-            ->get();
-
+      
         // Today's appointments
         $todaysAppointments = Appointment::with('patient')
             ->where('doctor_id', $doctorId)

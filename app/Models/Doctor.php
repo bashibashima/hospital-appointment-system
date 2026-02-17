@@ -30,14 +30,8 @@ class Doctor extends Model
         return $this->belongsTo(Specialization::class);
     }
 
-    /**
-     * Relationship: Doctor has many availabilities
-     */
-    public function availabilities()
-    {
-        return $this->hasMany(Availability::class);
-    }
 
+    
     /**
      * Relationship: Doctor has many appointments
      */
