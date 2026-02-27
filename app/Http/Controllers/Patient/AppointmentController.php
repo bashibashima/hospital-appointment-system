@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Patient;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Helpers\SlotHelper;        // ✅ ONLY HERE
+use App\Helpers\SlotHelper;       
 use Carbon\Carbon;
 use App\Models\Appointment;
 use App\Models\User;

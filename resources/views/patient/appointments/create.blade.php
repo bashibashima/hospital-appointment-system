@@ -12,7 +12,7 @@
 
             if (!doctorId || !date) return;
 
-            fetch(`{{ route('patient.get.available.slots') }}?doctor_id=${doctorId}&date=${date}`)
+            fetch(`{{ route('patient.available.slots') }}?doctor_id=${doctorId}&date=${date}`)
                 .then(res => res.json())
                 .then(data => {
                     const timeSelect = document.getElementById('appointment_time');

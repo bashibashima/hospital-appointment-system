@@ -177,10 +177,11 @@ Route::middleware(['auth', 'is_patient'])
         Route::post('/appointments/book', [PatientAppointmentController::class, 'book'])
             ->name('appointments.book');
 
-        // Automatic slot fetch (NO availability table)
-        Route::get('/available-slots',
-            [PatientAppointmentController::class, 'getAvailableSlots']
-        )->name('get.available.slots');
+            Route::get('/available-slots',
+    [PatientAppointmentController::class, 'getAvailableSlots']
+)->name('available.slots');
+    //     Route::get('/patient/available-slots', [PatientAppointmentController::class, 'getAvailableSlots']
+    //    )->name('patient.available.slots');
     });
 
 /*
