@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Patient;
 
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use App\Helpers\SlotHelper;       
 use Carbon\Carbon;
@@ -15,16 +17,17 @@ class AppointmentController extends Controller
     /**
      * Show all appointments for the logged-in patient
      */
-    public function index()
-    {
-        $appointments = Appointment::where('patient_id', auth()->id())
-            ->with(['doctor.doctor.specialization'])
-            ->orderBy('appointment_date', 'asc')
-            ->get();
+   public function index()
+{
+    $appointments = Appointment::where('patient_id', Auth::id())
+        ->whereRaw("TIMESTAMP(appointment_date, appointment_time) >= ?", [Carbon::now()])
+        ->orderBy('appointment_date')
+        ->orderBy('appointment_time')
+        ->with(['doctor.doctor.specialization'])
+        ->get();
 
-        return view('patient.appointments.index', compact('appointments'));
-    }
-
+    return view('patient.appointments.index', compact('appointments'));
+}
     /**
      * Show the appointment booking form
      */
@@ -93,7 +96,7 @@ class AppointmentController extends Controller
 
     $appointment = Appointment::create([
         'doctor_id'        => $request->doctor_id,
-        'patient_id'       => auth()->id(),
+        'patient_id'       => Auth::id(),
         'appointment_date' => $request->appointment_date,
         'appointment_time' => $time, // ✅ FIXED
         'notes'            => $request->notes,

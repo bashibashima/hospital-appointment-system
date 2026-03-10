@@ -17,7 +17,7 @@
                         <li class="py-2 flex justify-between items-center">
                             <div>
                                 {{ \Carbon\Carbon::parse($appt->appointment_date)->format('d M Y') }}
-                                at {{ \Carbon\Carbon::parse($appt->appointment_time)->format('H:i') }}
+                                at {{ \Carbon\Carbon::parse($appt->appointment_time)->format('h:i A')}}
                                 with Dr. {{ $appt->doctor?->name ?? 'Unknown' }}
                             </div>
                             <span class="text-sm px-2 py-1 bg-green-100 text-green-800 rounded">
@@ -36,7 +36,7 @@
 
         {{-- Action Buttons --}}
         <div class="mb-6 flex flex-wrap gap-4">
-            <a href="{{ route('patient.appointments') }}"
+            <a href=""
                class="bg-blue-100 hover:bg-blue-200 text-black px-5 py-2 rounded-md text-sm shadow font-medium">
                 📋 View All Appointments
             </a>

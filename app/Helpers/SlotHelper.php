@@ -1,4 +1,5 @@
-<?php 
+<?php
+
 namespace App\Helpers;
 
 use Carbon\Carbon;
@@ -8,23 +9,26 @@ class SlotHelper
 {
     public static function getAvailableSlots($doctorId, $date)
     {
-        // ❌ Sunday OFF only
+        // ❌ Sunday OFF
         $day = Carbon::parse($date)->format('l');
+
         if ($day === 'Sunday') {
             return [];
         }
 
-        // ✅ Default timings for all doctors
+        // Doctor working hours
         $start = Carbon::parse($date . ' 09:00');
         $end   = Carbon::parse($date . ' 17:00');
-        $duration = 15; // minutes
 
+        $duration = 15; // minutes
         $slots = [];
 
         while ($start < $end) {
-            $slot = $start->format('H:i');
 
-            // remove booked slots
+            // ✅ Use H:i:s format
+            $slot = $start->format('H:i:s');
+
+            // Check booked slots
             $isBooked = Appointment::where('doctor_id', $doctorId)
                 ->where('appointment_date', $date)
                 ->where('appointment_time', $slot)
@@ -40,4 +44,3 @@ class SlotHelper
         return $slots;
     }
 }
-?>

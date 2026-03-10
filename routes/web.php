@@ -168,8 +168,8 @@ Route::middleware(['auth', 'is_patient'])
         Route::get('/dashboard', [PatientDashboardController::class, 'index'])
             ->name('dashboard');
 
-        Route::get('/appointments', [PatientAppointmentController::class, 'index'])
-            ->name('appointments');
+        // Route::get('/appointments', [PatientAppointmentController::class, 'index'])
+        //     ->name('appointments');
 
         Route::get('/appointments/create', [PatientAppointmentController::class, 'create'])
             ->name('appointments.create');
